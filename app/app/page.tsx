@@ -8,7 +8,7 @@ export default function Home() {
   const [status, setStatus] = useState<any>(null);
 
   useEffect(() => {
-    fetch(`${API_URL}/status`)
+    fetch("/api/status")
       .then(r => r.json())
       .then(d => setStatus(d))
       .catch(() => {});
