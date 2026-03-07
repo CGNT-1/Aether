@@ -1,10 +1,19 @@
 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
+from fastapi.middleware.cors import CORSMiddleware
 import os
 import json
 
 app = FastAPI(title="TwinSisters Digital Billboard")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 STATUS_FILE = "/home/nous/sisters_public_status.json"
 
