@@ -1,8 +1,11 @@
+export const revalidate = 60;
+
 export async function GET() {
   try {
-    const res = await fetch("http://68.183.206.103:8000/status", {
-      next: { revalidate: 30 }
-    });
+    const res = await fetch(
+      "https://raw.githubusercontent.com/CGNT-1/Aether/main/public/status.json",
+      { next: { revalidate: 60 } }
+    );
     const data = await res.json();
     return Response.json(data);
   } catch {
