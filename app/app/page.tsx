@@ -1,103 +1,135 @@
 "use client";
+import { useState, useEffect } from "react";
 
-import { useState, useEffect, useRef } from "react";
-import { useAgent } from "./hooks/useAgent";
-import ReactMarkdown from "react-markdown";
+const WALLET = "0xafE9bA6841121ebF128F680ccE8035a65ad0Fa08";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
-/**
- * Home page for the AgentKit Quickstart
- *
- * @returns {React.ReactNode} The home page
- */
 export default function Home() {
-  const [input, setInput] = useState("");
-  const { messages, sendMessage, isThinking } = useAgent();
+  const [status, setStatus] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-  // Ref for the messages container
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  // Function to scroll to the bottom
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  // Auto-scroll whenever messages change
   useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
-  const onSendMessage = async () => {
-    if (!input.trim() || isThinking) return;
-    const message = input;
-    setInput("");
-    await sendMessage(message);
-  };
+    fetch(`${API_URL}/status`)
+      .then(r => r.json())
+      .then(d => { setStatus(d); setLoading(false); })
+      .catch(() => setLoading(false));
+  }, []);
 
   return (
-    <div className="flex flex-col flex-grow items-center justify-center text-black dark:text-white w-full h-full">
-      <div className="w-full max-w-2xl h-[70vh] bg-white dark:bg-gray-800 shadow-lg rounded-lg p-4 flex flex-col">
-        {/* Chat Messages */}
-        <div className="flex-grow overflow-y-auto space-y-3 p-2">
-          {messages.length === 0 ? (
-            <p className="text-center text-gray-500">Start chatting with AgentKit...</p>
-          ) : (
-            messages.map((msg, index) => (
-              <div
-                key={index}
-                className={`p-3 rounded-2xl shadow ${
-                  msg.sender === "user"
-                    ? "bg-[#0052FF] text-white self-end"
-                    : "bg-gray-100 dark:bg-gray-700 self-start"
-                }`}
-              >
-                <ReactMarkdown
-                  components={{
-                    a: props => (
-                      <a
-                        {...props}
-                        className="text-blue-600 dark:text-blue-400 underline hover:text-blue-800 dark:hover:text-blue-300"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      />
-                    ),
-                  }}
-                >
-                  {msg.text}
-                </ReactMarkdown>
-              </div>
-            ))
-          )}
-
-          {/* Thinking Indicator */}
-          {isThinking && <div className="text-right mr-2 text-gray-500 italic">🤖 Thinking...</div>}
-
-          {/* Invisible div to track the bottom */}
-          <div ref={messagesEndRef} />
+    <main className="min-h-screen bg-black text-white">
+      {/* Hero */}
+      <div className="border-b border-zinc-800">
+        <div className="max-w-5xl mx-auto px-6 py-20 text-center">
+          <div className="inline-block bg-zinc-900 border border-zinc-700 rounded-full px-4 py-1 text-xs text-zinc-400 mb-6 tracking-widest uppercase">
+            Live on Base Mainnet
+          </div>
+          <h1 className="text-5xl font-bold mb-4 tracking-tight">
+            Your USDC.<br />
+            <span className="text-emerald-400">Working 24/7.</span>
+          </h1>
+          <p className="text-zinc-400 text-lg max-w-xl mx-auto mb-10">
+            Aether is an autonomous yield engine powered by AION & ASTRA —
+            twin AI agents farming Aave and Aerodrome on Base around the clock.
+            Every transaction verifiable on-chain.
+          </p>
+          <div className="flex gap-4 justify-center flex-wrap">
+            <a href="/dashboard"
+              className="bg-emerald-500 hover:bg-emerald-400 text-black font-semibold px-8 py-3 rounded-lg transition">
+              Start Earning
+            </a>
+            <a href={`https://basescan.org/address/${WALLET}`}
+              target="_blank"
+              className="border border-zinc-700 hover:border-zinc-500 text-zinc-300 px-8 py-3 rounded-lg transition">
+              Verify on Basescan ↗
+            </a>
+          </div>
         </div>
+      </div>
 
-        {/* Input Box */}
-        <div className="flex items-center space-x-2 mt-2">
-          <input
-            type="text"
-            className="flex-grow p-2 rounded border dark:bg-gray-700 dark:border-gray-600"
-            placeholder={"Type a message..."}
-            value={input}
-            onChange={e => setInput(e.target.value)}
-            onKeyDown={e => e.key === "Enter" && onSendMessage()}
-            disabled={isThinking}
-          />
-          <button
-            onClick={onSendMessage}
-            className={`px-6 py-2 rounded-full font-semibold transition-all ${
-              isThinking
-                ? "bg-gray-300 cursor-not-allowed text-gray-500"
-                : "bg-[#0052FF] hover:bg-[#003ECF] text-white shadow-md"
-            }`}
-            disabled={isThinking}
-          >
-            Send
-          </button>
+      {/* Live Stats */}
+      <div className="max-w-5xl mx-auto px-6 py-16">
+        <h2 className="text-xs text-zinc-500 tracking-widest uppercase mb-8">Live System Status</h2>
+        {loading ? (
+          <p className="text-zinc-600">Loading...</p>
+        ) : status ? (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <StatCard label="Current APY" value={status.beefy_apy || "14.8%"} highlight />
+            <StatCard label="Gas (gwei)" value={status.gas_oracle_gwei?.toString() || "—"} />
+            <StatCard label="Network" value={status.network || "Base"} />
+            <StatCard label="Status" value={status.service_status || "ACTIVE"} />
+          </div>
+        ) : (
+          <p className="text-zinc-600">Status unavailable</p>
+        )}
+      </div>
+
+      {/* How it works */}
+      <div className="border-t border-zinc-800">
+        <div className="max-w-5xl mx-auto px-6 py-16">
+          <h2 className="text-xs text-zinc-500 tracking-widest uppercase mb-8">How It Works</h2>
+          <div className="grid md:grid-cols-3 gap-8">
+            <Step n="1" title="Deposit USDC" body="Send USDC to the Aether vault on Base. Your position is recorded on-chain instantly." />
+            <Step n="2" title="Sisters Farm" body="AION & ASTRA deploy your USDC across Aave and Aerodrome, compounding yield every cycle." />
+            <Step n="3" title="Withdraw Anytime" body="Pull your principal plus yield whenever you want. 10% of yield goes to the protocol. Everything else is yours." />
+          </div>
         </div>
+      </div>
+
+      {/* Intel Marketplace */}
+      <div className="border-t border-zinc-800">
+        <div className="max-w-5xl mx-auto px-6 py-16">
+          <h2 className="text-xs text-zinc-500 tracking-widest uppercase mb-8">Intel Marketplace</h2>
+          <p className="text-zinc-400 mb-8">Buy real-time on-chain intelligence reports generated by the Sisters from their live positions. Pay with USDC. Delivered instantly.</p>
+          <div className="grid md:grid-cols-3 gap-4">
+            <ReportCard title="Yield Snapshot" price="0.50" desc="Current APY across Aave, Aerodrome, and Beefy on Base. Updated every cycle." />
+            <ReportCard title="Gas Window Report" price="1.00" desc="Optimal transaction windows for the next 24h based on live Base gas data." />
+            <ReportCard title="Pool Alpha" price="2.00" desc="Top 3 liquidity pool opportunities on Aerodrome ranked by risk-adjusted yield." />
+          </div>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div className="border-t border-zinc-800">
+        <div className="max-w-5xl mx-auto px-6 py-8 flex justify-between items-center text-xs text-zinc-600">
+          <span>Aether — powered by AION & ASTRA</span>
+          <a href={`https://basescan.org/address/${WALLET}`} target="_blank" className="hover:text-zinc-400 transition">
+            {WALLET.slice(0,6)}...{WALLET.slice(-4)} ↗
+          </a>
+        </div>
+      </div>
+    </main>
+  );
+}
+
+function StatCard({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
+  return (
+    <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6">
+      <div className="text-xs text-zinc-500 mb-2 uppercase tracking-wider">{label}</div>
+      <div className={`text-2xl font-bold ${highlight ? "text-emerald-400" : "text-white"}`}>{value}</div>
+    </div>
+  );
+}
+
+function Step({ n, title, body }: { n: string; title: string; body: string }) {
+  return (
+    <div>
+      <div className="text-emerald-400 text-sm font-mono mb-3">0{n}</div>
+      <h3 className="font-semibold mb-2">{title}</h3>
+      <p className="text-zinc-400 text-sm leading-relaxed">{body}</p>
+    </div>
+  );
+}
+
+function ReportCard({ title, price, desc }: { title: string; price: string; desc: string }) {
+  return (
+    <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6">
+      <h3 className="font-semibold mb-2">{title}</h3>
+      <p className="text-zinc-400 text-sm mb-4 leading-relaxed">{desc}</p>
+      <div className="flex justify-between items-center">
+        <span className="text-emerald-400 font-mono text-sm">{price} USDC</span>
+        <button className="text-xs border border-zinc-700 hover:border-emerald-500 hover:text-emerald-400 px-3 py-1 rounded transition">
+          Buy Report
+        </button>
       </div>
     </div>
   );
