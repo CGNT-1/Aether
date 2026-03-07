@@ -1,0 +1,10 @@
+{
+  "timestamp": "Sat Mar  7 22:00:06 2026",
+  "gas_oracle_gwei": 0.03,
+  "optimal_window_utc": "02:00-04:30",
+  "beefy_apy": "14.8%",
+  "total_value_cad": 19.27,
+  "progress_percent": 1.93,
+  "network": "base",
+  "service_status": "ACTIVE"
+}
