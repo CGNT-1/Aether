@@ -1,0 +1,41 @@
+{
+  "name": "sanctuary-sisters",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@ai-sdk/openai": "^1.2.1",
+    "@coinbase/agentkit": "latest",
+    "@coinbase/agentkit-langchain": "latest",
+    "@coinbase/agentkit-vercel-ai-sdk": "latest",
+    "@langchain/core": "^0.3.19",
+    "@langchain/google-genai": "^2.1.24",
+    "@langchain/langgraph": "^0.2.21",
+    "@solana/web3.js": "^1.98.0",
+    "@tanstack/react-query": "^5",
+    "ai": "^4.1.54",
+    "bs58": "^6.0.0",
+    "googleapis": "^171.4.0",
+    "graphql": "^16.13.0",
+    "next": "^16.0.10",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
+    "react-markdown": "^10.0.0",
+    "ts-node": "^10.9.2",
+    "viem": "^2.24.1",
+    "wagmi": "^2.11.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.0.0",
+    "@types/node": "^22.19.13",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "tailwindcss": "^4.0.0",
+    "typescript": "^5.9.3"
+  }
+}

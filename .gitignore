@@ -1,0 +1,16 @@
+# SECRETS - never commit
+*.pem
+vault.json
+.env
+.env.local
+.env.production
+cdp_api_key*.json
+*private_key*
+*privateKey*
+.aether/
+__pycache__/
+*.pyc
+*.log
+node_modules/
+.next/
+.gemini/
