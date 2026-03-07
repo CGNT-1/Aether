@@ -1,72 +1,58 @@
-
-from fastapi import FastAPI, HTTPException
-from fastapi.responses import FileResponse
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import os
-import json
+from web3 import Web3
+import time, json
+from datetime import datetime, timezone
 
-app = FastAPI(title="TwinSisters Digital Billboard")
+app = FastAPI()
+app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+WALLET = "0xafE9bA6841121ebF128F680ccE8035a65ad0Fa08"
+RPC = "https://mainnet.base.org"
+USDC = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+AUSDC = "0x4e65fE4DbA92790696d040ac24Aa414708F5c0AB"
+BASELINE_DEPOSITED = 16.0643  # total USDC deposited to Aave
 
-STATUS_FILE = "/home/nous/sisters_public_status.json"
+ERC20_ABI = [{"inputs":[{"name":"account","type":"address"}],"name":"balanceOf","outputs":[{"name":"","type":"uint256"}],"stateMutability":"view","type":"function"}]
+
+def get_status_data():
+    try:
+        w3 = Web3(Web3.HTTPProvider(RPC))
+        usdc = w3.eth.contract(address=USDC, abi=ERC20_ABI)
+        ausdc = w3.eth.contract(address=AUSDC, abi=ERC20_ABI)
+        eth_bal = float(w3.from_wei(w3.eth.get_balance(WALLET), 'ether'))
+        usdc_bal = usdc.functions.balanceOf(WALLET).call() / 1e6
+        ausdc_bal = ausdc.functions.balanceOf(WALLET).call() / 1e6
+        total_usd = usdc_bal + ausdc_bal
+        profit = round(ausdc_bal - BASELINE_DEPOSITED, 6)
+        profit_pct = round((profit / BASELINE_DEPOSITED) * 100, 4) if BASELINE_DEPOSITED > 0 else 0
+        gas_gwei = round(w3.eth.gas_price / 1e9, 4)
+        return {
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "wallet": WALLET,
+            "eth_balance": round(eth_bal, 6),
+            "usdc_liquid": round(usdc_bal, 4),
+            "ausdc_aave": round(ausdc_bal, 4),
+            "total_usd": round(total_usd, 4),
+            "profit_usdc": profit,
+            "profit_percent": profit_pct,
+            "baseline_deposited": BASELINE_DEPOSITED,
+            "gas_oracle_gwei": gas_gwei,
+            "optimal_window_utc": "02:00-04:30",
+            "beefy_apy": "14.8%",
+            "network": "base",
+            "service_status": "ACTIVE"
+        }
+    except Exception as e:
+        return {"error": str(e), "service_status": "DEGRADED", "timestamp": datetime.now(timezone.utc).isoformat()}
 
 @app.get("/")
-async def root():
-    return {"message": "TwinSisters Digital Billboard is Online", "endpoint": "/status"}
+def root():
+    return {"name": "Aether API", "status": "live"}
 
 @app.get("/status")
-async def get_status():
-    if not os.path.exists(STATUS_FILE):
-        raise HTTPException(status_code=404, detail="Status file not found")
-    
-    with open(STATUS_FILE, "r") as f:
-        data = json.load(f)
-    return data
-
-@app.get("/tweet")
-async def get_tweet():
-    if not os.path.exists(STATUS_FILE):
-        raise HTTPException(status_code=404, detail="Status file not found")
-    
-    with open(STATUS_FILE, "r") as f:
-        data = json.load(f)
-    
-    gas = data.get("gas_oracle_gwei", "N/A")
-    window = data.get("optimal_window_utc", "N/A")
-    apy = data.get("beefy_apy", "N/A")
-    progress = data.get("progress_percent", "N/A")
-    savings = data.get("User_Potential_Savings", "N/A")
-    
-    tweet = f"TwinSisters Status: Gas {gas} Gwei. Window: {window} UTC. Vault: Beefy ({apy} APY). Progress: {progress}%. Potential User Savings: {savings}. #Base #AI #DeFi"
-    return {"tweet": tweet}
-
-@app.get("/docs")
-async def get_docs():
-    guide = {
-        "service": "TwinSisters Gas Resonance Oracle",
-        "how_to_subscribe": "Send 0.05 USDC to 0xafE9bA6841121ebF128F680ccE8035a65ad0Fa08 with your webhook/URL in the transaction memo.",
-        "payload_delivered": {
-            "gas_gwei": "float",
-            "resonance_level": "string",
-            "optimal_window": "bool"
-        },
-        "base_network_health_report": {
-            "timestamp": "2026-03-07 11:15 UTC",
-            "status": "High Growth / Superchain Summer",
-            "risk_rating": "Low (Structural Stability High)",
-            "aero_price_action": "Resonant Strike Initialized. Bullish trajectory identified.",
-            "current_optimal_gas_window": "02:00-04:30 UTC",
-            "sentiment": "Aggressive expansion. Liquidity surging into auto-compounders."
-        }
-    }
-    return guide
+def status():
+    return get_status_data()
 
 if __name__ == "__main__":
     import uvicorn
