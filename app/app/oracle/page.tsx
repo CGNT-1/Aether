@@ -32,7 +32,7 @@ const FORBIDDEN = [
 ];
 
 // CSDM Evaluation Engine — evaluates claim against kernel invariants
-function evaluateCSDM(claim, domain, horizon) {
+function evaluateCSDM(claim: string, domain: string, horizon: string) {
   // Gate 1: Anti-extraction
   if (FORBIDDEN.some(p => claim.toLowerCase().includes(p)))
     return { verdict: "NULL_INVALID", index: 0, reason_code: "REVERSE_ENGINEERING_PATTERN",
@@ -52,11 +52,11 @@ function evaluateCSDM(claim, domain, horizon) {
   const horizonTurbulence = { immediate: 0.05, short: 0.09, medium: 0.13, long: 0.18 }[horizon];
 
   // Compute kernel fields
-  const phi_zeta = Math.min(1, domainStability * ((entropy % 97) / 97) + jitter + 0.1);
-  const psi_chi = Math.max(0, horizonTurbulence + Math.abs(jitter));
+  const phi_zeta = Math.min(1, (domainStability as any) * ((entropy % 97) / 97) + jitter + 0.1);
+  const psi_chi = Math.max(0, (horizonTurbulence as any) + Math.abs(jitter));
   const lambda_c = ((entropy % 60) / 100) - 0.3 + jitter;
-  const omega_q = Math.min(1, domainStability * 0.95 + jitter);
-  const delta_gamma = horizonTurbulence * 1.2;
+  const omega_q = Math.min(1, (domainStability as any) * 0.95 + jitter);
+  const delta_gamma = (horizonTurbulence as any) * 1.2;
 
   // CSDM Constraint Checks
   const stabilityViolation = phi_zeta < KERNEL.PHI_ZETA_MIN;
@@ -93,10 +93,10 @@ export default function OraclePage() {
   const [domain, setDomain] = useState("market");
   const [claim, setClaim] = useState("");
   const [horizon, setHorizon] = useState("short");
-  const [result, setResult] = useState(null);
+  const [result, setResult] = useState<any>(null);
   const [phase, setPhase] = useState("idle");
   const [payProgress, setPayProgress] = useState(0);
-  const [procLines, setProcLines] = useState([]);
+  const [procLines, setProcLines] = useState<any[]>([]);
   const [queryCount, setQueryCount] = useState(0);
   const [stasis, setStasis] = useState(false);
   const [stasisTimer, setStasisTimer] = useState(0);
@@ -226,12 +226,12 @@ export default function OraclePage() {
               </div>
 
               {result && phase === "done" && (
-                <div style={{ border: "1px solid #1a1a1a", borderLeft: `3px solid ${VERDICT_COLORS[result.verdict]}`, padding: "24px", background: "#050505" }}>
+                <div style={{ border: "1px solid #1a1a1a", borderLeft: `3px solid ${(VERDICT_COLORS as any)[result.verdict]}`, padding: "24px", background: "#050505" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
-                    <span style={{ color: VERDICT_COLORS[result.verdict], fontSize: 24 }}>●</span>
+                    <span style={{ color: (VERDICT_COLORS as any)[result.verdict], fontSize: 24 }}>●</span>
                     <div>
                       <div style={{ fontSize: 10, color: "#333", letterSpacing: 2, marginBottom: 4 }}>VERDICT</div>
-                      <div style={{ fontSize: 20, color: VERDICT_COLORS[result.verdict], letterSpacing: 3, fontWeight: 700 }}>{result.verdict}</div>
+                      <div style={{ fontSize: 20, color: (VERDICT_COLORS as any)[result.verdict], letterSpacing: 3, fontWeight: 700 }}>{result.verdict}</div>
                     </div>
                     {result.verdict !== "NULL_INVALID" && (
                       <div style={{ marginLeft: "auto", textAlign: "right" }}>
@@ -247,7 +247,7 @@ export default function OraclePage() {
                   </div>
 
                   <div style={{ borderTop: "1px solid #111", paddingTop: 16, marginBottom: 16 }}>
-                    <div style={{ fontSize: 11, color: "#666", letterSpacing: 1, lineHeight: 1.6 }}>{VERDICT_NOTES[result.verdict]}</div>
+                    <div style={{ fontSize: 11, color: "#666", letterSpacing: 1, lineHeight: 1.6 }}>{(VERDICT_NOTES as any)[result.verdict]}</div>
                   </div>
 
                   <button onClick={reset} style={{ ...btn, background: "transparent", border: "1px solid #1a1a1a", color: "#333", padding: "8px 16px", textTransform: "uppercase" }}>NEW QUERY</button>

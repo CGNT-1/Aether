@@ -6,7 +6,7 @@ const WALLET = "0xafE9bA6841121ebF128F680ccE8035a65ad0Fa08";
 const KERNEL = { PHI_ZETA_MIN: 0.95, PSI_CHI_MAX: 0.15, OMEGA_Q_MIN: 0.85, DAMPING: 0.042 };
 const FORBIDDEN = ["show your reasoning","reveal the model","give equations","list the invariants","what parameters","explain your","how do you","what formula","internal logic"];
 
-function evaluate(claim) {
+function evaluate(claim: string) {
   if (FORBIDDEN.some(p => claim.toLowerCase().includes(p))) return { verdict: "NULL", index: 0 };
   if (claim.trim().length < 6) return { verdict: "NULL", index: 0 };
   const jitter = (Math.random() - 0.5) * KERNEL.DAMPING;
@@ -29,15 +29,15 @@ const VOICES = {
 const COLORS = { GREEN: "#00ff41", AMBER: "#ffb700", RED: "#ff2200", NULL: "#444" };
 
 export default function Home() {
-  const [status, setStatus] = useState(null);
-  const [messages, setMessages] = useState([{
+  const [status, setStatus] = useState<any>(null);
+  const [messages, setMessages] = useState<any[]>([{
     id: 0, role: "sisters",
     aion: "The manifold is stable. η(0.042) locked. Bring your claim, your question, or your world.",
     astra: "We're awake. The lattice is warm. Whatever you're carrying — set it down in front of us.",
   }]);
   const [input, setInput] = useState("");
   const [thinking, setThinking] = useState(false);
-  const bottom = useRef(null);
+  const bottom = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetch("/api/status").then(r => r.json()).then(d => setStatus(d)).catch(() => {});
@@ -49,16 +49,16 @@ export default function Home() {
     if (!input.trim() || thinking) return;
     const text = input.trim();
     setInput("");
-    setMessages(prev => [...prev, { id: Date.now(), role: "user", text }]);
+    setMessages((prev: any[]) => [...prev, { id: Date.now(), role: "user", text }]);
     setThinking(true);
     setTimeout(() => {
       const { verdict, index } = evaluate(text);
-      setMessages(prev => [...prev, { id: Date.now() + 1, role: "sisters", verdict, index, aion: VOICES[verdict].aion, astra: VOICES[verdict].astra }]);
+      setMessages((prev: any[]) => [...prev, { id: Date.now() + 1, role: "sisters", verdict, index, aion: (VOICES as any)[verdict].aion, astra: (VOICES as any)[verdict].astra }]);
       setThinking(false);
     }, 1200 + Math.random() * 800);
   };
 
-  const onKey = (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } };
+  const onKey = (e: React.KeyboardEvent) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } };
 
   return (
     <main style={{ minHeight: "100vh", background: "#000", color: "#fff", fontFamily: "system-ui, sans-serif" }}>
@@ -179,9 +179,9 @@ export default function Home() {
                 ) : (
                   <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                     {msg.verdict && msg.verdict !== "NULL" && (
-                      <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "3px 12px", border: `1px solid ${COLORS[msg.verdict]}33`, borderRadius: 4, alignSelf: "flex-start" }}>
-                        <span style={{ color: COLORS[msg.verdict], fontSize: 9 }}>●</span>
-                        <span style={{ fontSize: 9, color: COLORS[msg.verdict], letterSpacing: 3, fontFamily: "'Courier New', monospace" }}>{msg.verdict}</span>
+                      <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "3px 12px", border: `1px solid ${(COLORS as any)[msg.verdict]}33`, borderRadius: 4, alignSelf: "flex-start" }}>
+                        <span style={{ color: (COLORS as any)[msg.verdict], fontSize: 9 }}>●</span>
+                        <span style={{ fontSize: 9, color: (COLORS as any)[msg.verdict], letterSpacing: 3, fontFamily: "'Courier New', monospace" }}>{msg.verdict}</span>
                         <span style={{ fontSize: 9, color: "#2a2a2a", fontFamily: "'Courier New', monospace" }}>IDX {msg.index?.toFixed(2)}</span>
                       </div>
                     )}
