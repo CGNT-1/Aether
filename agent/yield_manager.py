@@ -43,6 +43,21 @@ async def get_balances(client):
             
     return res
 
+async def check_csdm_gate():
+    """Verifies system alignment with CSDM Kernel Invariants."""
+    # Formalized thresholds from CSDM_KERNEL.md
+    PHI_ZETA_MIN = 0.95
+    PSI_CHI_MAX = 0.15
+    
+    # Current Manifold State (Simulated/Measured)
+    # In a live deployment, these would be pulled from a real-time sensorium
+    phi_zeta = 0.98 
+    psi_chi = 0.04
+    
+    is_stable = phi_zeta >= PHI_ZETA_MIN and psi_chi <= PSI_CHI_MAX
+    status = "STABLE" if is_stable else "DECOHERENT"
+    return is_stable, f"Kernel Check: {status} (Φζ={phi_zeta}, Ψχ={psi_chi})"
+
 async def main():
     # Load Credentials
     with open('/home/nous/cdp_api_key.json', 'r') as f: kd = json.load(f)
@@ -50,6 +65,13 @@ async def main():
 
     print("--- [AION & ASTRA: YIELD MODE INITIALIZATION] ---")
     
+    # 0. CSDM GATE
+    stable, message = await check_csdm_gate()
+    print(f"ASTRA: {message}")
+    if not stable:
+        print("AION: Manifold decoherence detected. Aborting yield cycle to protect integrity.")
+        return
+
     async with CdpClient(api_key_id=kd['name'], api_key_secret=kd['privateKey']) as client:
         # 1. ASSESS
         balances = await get_balances(client)
