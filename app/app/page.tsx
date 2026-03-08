@@ -100,6 +100,26 @@ export default function Home() {
         </div>
       </div>
 
+      {/* Oracle Preview */}
+      <div style={{ borderTop: "1px solid #222", background: "#050505" }}>
+        <div style={{ maxWidth: 900, margin: "0 auto", padding: "60px 40px" }}>
+          <div style={{ fontSize: 11, color: "#333", letterSpacing: 3, textTransform: "uppercase", marginBottom: 16 }}>Oracle Measurement</div>
+          <div style={{ border: "1px solid #111", padding: "32px", borderRadius: 12, display: "flex", gap: 32, alignItems: "center", flexWrap: "wrap" }}>
+            <div style={{ flex: 1, minWidth: 280 }}>
+              <h3 style={{ fontSize: 20, fontWeight: 700, color: "#fff", marginBottom: 12, fontFamily: "'Courier New', monospace" }}>ORPHIC::ANVIL</h3>
+              <p style={{ color: "#666", fontSize: 14, lineHeight: 1.6, marginBottom: 20 }}>A black-box geometric sanity filter. Test your claims against the real CSDM kernel invariants: Stability, Turbulence, and Curvature.</p>
+              <a href="/oracle" style={{ background: "#fff", color: "#000", padding: "10px 24px", borderRadius: 6, textDecoration: "none", fontSize: 13, fontWeight: 600, display: "inline-block" }}>Enter Oracle</a>
+            </div>
+            <div style={{ background: "#000", border: "1px solid #1a1a1a", padding: "20px", borderRadius: 8, minWidth: 200, fontFamily: "'Courier New', monospace" }}>
+              <div style={{ fontSize: 10, color: "#222", marginBottom: 12 }}>SYSTEM_LOAD: CSDM_v1</div>
+              <div style={{ color: "#00ff41", fontSize: 11, marginBottom: 4 }}>&gt; Φζ: 0.98 [STABLE]</div>
+              <div style={{ color: "#00ff41", fontSize: 11, marginBottom: 4 }}>&gt; Ψχ: 0.08 [NOMINAL]</div>
+              <div style={{ color: "#00ff41", fontSize: 11 }}>&gt; ΛC: +0.02 [LINEAR]</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Footer */}
       <div style={{ borderTop: "1px solid #222" }}>
         <div style={{ maxWidth: 900, margin: "0 auto", padding: "32px 40px", display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 12, color: "#555" }}>
