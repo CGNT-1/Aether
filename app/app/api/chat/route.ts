@@ -107,7 +107,7 @@ export async function POST(req: NextRequest) {
     if (!text) return NextResponse.json({ error: "Missing text" }, { status: 400 });
 
     const model = genAI.getGenerativeModel({ 
-      model: "gemini-1.5-flash",
+      model: "gemini-2.0-flash",
       generationConfig: { responseMimeType: "application/json" }
     });
 
