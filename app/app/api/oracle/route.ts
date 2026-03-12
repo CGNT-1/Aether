@@ -1,7 +1,28 @@
 import { NextRequest, NextResponse } from "next/server";
-import { execSync } from "child_process";
+import { execFileSync } from "child_process";
 import fs from "fs";
-import path from "path";
+
+// Simple in-memory rate limiting (10 requests per minute per IP)
+const rateLimitMap = new Map<string, { count: number; lastReset: number }>();
+const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
+const MAX_REQUESTS = 10;
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const entry = rateLimitMap.get(ip);
+
+  if (!entry || now - entry.lastReset > RATE_LIMIT_WINDOW) {
+    rateLimitMap.set(ip, { count: 1, lastReset: now });
+    return false;
+  }
+
+  if (entry.count >= MAX_REQUESTS) {
+    return true;
+  }
+
+  entry.count++;
+  return false;
+}
 
 function getManifoldState() {
   try {
@@ -43,21 +64,47 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
+  // 1. Rate Limiting
+  const ip = req.headers.get("x-forwarded-for") || req.ip || "unknown";
+  if (isRateLimited(ip)) {
+    return NextResponse.json({ error: "Too many requests. Limit is 10 per minute." }, { status: 429 });
+  }
+
   try {
     const body = await req.json();
-    const { v_total, v_resonant, entropy, strike_amount, est_gas, is_resonant } = body;
+    
+    // 2. Input Validation & Sanitization
+    const sanitize = (val: any, min: number, max: number, fallback: number) => {
+      const num = parseFloat(val);
+      if (isNaN(num) || num < min || num > max) return fallback;
+      return num;
+    };
+
+    const state = getManifoldState();
+    
+    // Valid ranges for TMM parameters
+    const vt = sanitize(body.v_total, 0, 1000000, state.v_total);
+    const vr = sanitize(body.v_resonant, 0, 1000000, state.v_resonant);
+    const et = sanitize(body.entropy, 0, 100, state.entropy);
+    const strike_amount = sanitize(body.strike_amount, 0, 1000000, 0);
+    const est_gas = sanitize(body.est_gas, 0, 10, 0);
+    const is_resonant = !!body.is_resonant;
 
     const pythonPath = "/home/nous/aether_env/bin/python3";
     const scriptPath = "/home/nous/tmm_runtime.py";
 
-    const state = getManifoldState();
-    const vt = v_total !== undefined ? v_total : state.v_total;
-    const vr = v_resonant !== undefined ? v_resonant : state.v_resonant;
-    const et = entropy !== undefined ? entropy : state.entropy;
+    // 3. Secure Execution via execFileSync (no shell interpolation)
+    const args = [
+      scriptPath,
+      "--v_total", vt.toString(),
+      "--v_resonant", vr.toString(),
+      "--entropy", et.toString(),
+      "--strike_amount", strike_amount.toString(),
+      "--est_gas", est_gas.toString()
+    ];
+    if (is_resonant) args.push("--is_resonant");
 
-    const cmd = `${pythonPath} ${scriptPath} --v_total ${vt} --v_resonant ${vr} --entropy ${et} --strike_amount ${strike_amount || 0} --est_gas ${est_gas || 0} ${is_resonant ? "--is_resonant" : ""}`;
-
-    const output = execSync(cmd).toString().trim();
+    const output = execFileSync(pythonPath, args).toString().trim();
     const lines = output.split("\n");
     const jsonOutput = lines[lines.length - 1];
     const result = JSON.parse(jsonOutput);
@@ -67,7 +114,7 @@ export async function POST(req: NextRequest) {
     console.error("Oracle API Error:", error);
     return NextResponse.json({ 
       error: "TMM Runtime Error", 
-      message: error.message,
+      message: "Internal processing error. Ensure inputs are valid.",
       coherence: 0,
       threshold: 0.97404,
       phi_zeta: 0,
