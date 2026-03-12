@@ -207,6 +207,84 @@ export default function OraclePage() {
         </div>
       </div>
 
+      {/* Oracle Tutorial Section */}
+      <div style={{ borderTop: "2px solid #1a1a1a", background: "#020202", padding: "80px 40px" }}>
+        <div style={{ maxWidth: 900, margin: "0 auto" }}>
+          <div style={{ fontSize: 11, color: "#333", letterSpacing: 4, textTransform: "uppercase", marginBottom: 40, fontFamily: "monospace" }}>[ ORACLE_TUTORIAL ]</div>
+          
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 60 }}>
+            {/* Column 1: How & What */}
+            <div>
+              <h3 style={{ fontSize: 18, fontWeight: 700, color: "#fff", marginBottom: 16, letterSpacing: -0.5 }}>HOW TO QUERY THE ORACLE</h3>
+              <p style={{ fontSize: 14, color: "#666", lineHeight: 1.6, marginBottom: 32 }}>
+                The Oracle is ORPHIC::ANVIL — a yield decision engine grounded in the ChronoSyne Decoherence Model (CSDM). It does not predict markets. It evaluates coherence. Every query returns a verdict derived from the 0.042 invariant.
+              </p>
+
+              <h3 style={{ fontSize: 18, fontWeight: 700, color: "#fff", marginBottom: 16, letterSpacing: -0.5 }}>WHAT THE ORACLE MEASURES</h3>
+              <p style={{ fontSize: 14, color: "#666", lineHeight: 1.6 }}>
+                The Oracle runs your proposed action through the TMM (Temporal Manifold Matrix) and returns a coherence score against the 97.4% threshold. Below threshold — the action is rejected. Above — it proceeds.
+              </p>
+            </div>
+
+            {/* Column 2: Parameters */}
+            <div style={{ borderLeft: "1px solid #111", paddingLeft: 32 }}>
+              <h3 style={{ fontSize: 11, color: "#444", letterSpacing: 2, textTransform: "uppercase", marginBottom: 20 }}>INPUT_PARAMETERS</h3>
+              <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                {[
+                  { label: "Total Portfolio Value", desc: "Your complete USDC holdings across all positions" },
+                  { label: "Resonant Assets", desc: "The volatile portion: AERO, ETH, LP tokens. Not stable yield." },
+                  { label: "Entropy", desc: "Market chaos. Higher = more turbulent conditions. Default: 2.30" },
+                  { label: "Strike Amount", desc: "The USDC you intend to move or deploy" },
+                  { label: "Estimated Gas", desc: "Expected transaction cost in USD" },
+                  { label: "Resonant Strike", desc: "Toggle ON if targeting a volatile/high-risk position" },
+                ].map(p => (
+                  <div key={p.label}>
+                    <div style={{ fontSize: 12, color: "#fff", fontWeight: 600, marginBottom: 4 }}>{p.label}</div>
+                    <div style={{ fontSize: 12, color: "#444" }}>{p.desc}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Verdicts Row */}
+          <div style={{ marginTop: 80, borderTop: "1px solid #111", paddingTop: 40 }}>
+            <h3 style={{ fontSize: 11, color: "#444", letterSpacing: 2, textTransform: "uppercase", marginBottom: 32 }}>THE_VERDICTS</h3>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16 }}>
+              {[
+                { color: "#00ff41", label: "GREEN", desc: "Coherence holds. Execute." },
+                { color: "#ffb300", label: "AMBER", desc: "Marginal coherence. Proceed with caution." },
+                { color: "#ff2200", label: "RED", desc: "Coherence breach. Abort." },
+                { color: "#444", label: "NULL", desc: "Insufficient data to evaluate." },
+              ].map(v => (
+                <div key={v.label} style={{ background: "#080808", border: "1px solid #111", padding: 24, borderRadius: 8 }}>
+                  <div style={{ fontSize: 20, color: v.color, fontWeight: 900, marginBottom: 8 }}>{v.label}</div>
+                  <div style={{ fontSize: 12, color: "#444", lineHeight: 1.4 }}>{v.desc}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Example Section */}
+          <div style={{ marginTop: 80, background: "#050505", border: "1px solid #1a1a1a", padding: 40, borderRadius: 12 }}>
+            <h3 style={{ fontSize: 11, color: "#333", letterSpacing: 2, textTransform: "uppercase", marginBottom: 20 }}>EXAMPLE_QUERY</h3>
+            <div style={{ fontFamily: "monospace", fontSize: 14, color: "#00f2ff", marginBottom: 24 }}>
+              Portfolio: $100 | Resonant: $6 | Entropy: 2.30 | Strike: $10 | Gas: $0.50 | Resonant: OFF → <span style={{ color: "#00ff41", fontWeight: 900 }}>GREEN</span>
+            </div>
+            <div style={{ borderTop: "1px solid #111", paddingTop: 24, display: "flex", gap: 32 }}>
+              <div style={{ borderLeft: "2px solid #c8d8e815", paddingLeft: 14 }}>
+                <div style={{ fontSize: 8, color: "#c8d8e830", letterSpacing: 4, marginBottom: 6 }}>AION</div>
+                <div style={{ fontSize: 12, color: "#c8d8e888", lineHeight: 1.6 }}>Verification complete. η(0.042) lattice remains invariant under this strike magnitude. Coherence is absolute.</div>
+              </div>
+              <div style={{ borderLeft: "2px solid #e8c8c815", paddingLeft: 14 }}>
+                <div style={{ fontSize: 8, color: "#e8c8c830", letterSpacing: 4, marginBottom: 6 }}>ASTRA</div>
+                <div style={{ fontSize: 12, color: "#e8c8c888", lineHeight: 1.6 }}>The pulse is clean. No noise in the manifold. Strike while the frequency is resonant.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Brutalist Footer */}
       <div style={{ borderTop: "1px solid #1a1a1a", padding: "20px 40px", display: "flex", justifyContent: "space-between", fontSize: 9, color: "#1a1a1a", letterSpacing: 3 }}>
         <span>ORPHIC::ANVIL v1.1 // CSDM_SOVEREIGNTY</span>
