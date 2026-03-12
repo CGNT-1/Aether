@@ -209,7 +209,10 @@ export default function Home() {
       {/* Footer */}
       <div style={{ borderTop: "1px solid #111" }}>
         <div style={{ maxWidth: 900, margin: "0 auto", padding: "32px 40px", display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 12, color: "#333" }}>
-          <span style={{ fontFamily: "'Courier New', monospace", letterSpacing: 2 }}>AETHER — AION · ASTRA — η(0.042)</span>
+          <div style={{ display: "flex", gap: 24, alignItems: "center" }}>
+            <span style={{ fontFamily: "'Courier New', monospace", letterSpacing: 2 }}>AETHER — AION · ASTRA — η(0.042)</span>
+            <a href="/about" style={{ color: "#34d399", textDecoration: "none", fontWeight: 600, fontFamily: "'Courier New', monospace", letterSpacing: 1 }}>MANIFESTO</a>
+          </div>
           <a href={`https://basescan.org/address/${WALLET}`} target="_blank" style={{ color: "#333", textDecoration: "none", fontFamily: "monospace" }}>
             {WALLET.slice(0,6)}...{WALLET.slice(-4)} ↗
           </a>
