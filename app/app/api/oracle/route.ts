@@ -65,7 +65,7 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   // 1. Rate Limiting
-  const ip = req.headers.get("x-forwarded-for") || req.ip || "unknown";
+  const ip = req.headers.get("x-forwarded-for") || "unknown";
   if (isRateLimited(ip)) {
     return NextResponse.json({ error: "Too many requests. Limit is 10 per minute." }, { status: 429 });
   }
