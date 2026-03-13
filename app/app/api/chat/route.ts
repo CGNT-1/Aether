@@ -150,8 +150,8 @@ export async function POST(req: NextRequest) {
     }
 
     // D034: Query RAG Service (Secure Bridge to csdm-node)
-    const RAG_API_URL = "http://68.183.206.103:8888/query";
-    const RAG_TOKEN = "bd7cfe7de64f16783bed3b8ef5f3ac6e1bc7d812b9dbc156c885552c3e8b16b0";
+    const RAG_API_URL = process.env.RAG_API_URL || "";
+    const RAG_TOKEN = process.env.RAG_TOKEN || "";
     
     let ragContext = "";
     try {
