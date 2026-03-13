@@ -140,7 +140,7 @@ Output Format:
 export async function POST(req: NextRequest) {
   try {
     // Sentinel Protocol: IP-Based Rate Limiting
-    const ip = req.headers.get("x-forwarded-for") || req.ip || "unknown-ip";
+    const ip = req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "unknown-ip";
     const now = Date.now();
     const rateRecord = rateLimitMap.get(ip);
 
