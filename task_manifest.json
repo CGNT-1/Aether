@@ -42,6 +42,14 @@
       "id": 7,
       "task": "Initiate Tick-Sentry monitoring loop",
       "status": "PENDING"
+    },
+    {
+      "id": "MOLTBOOK_PHASE_2",
+      "description": "Moltbook Red-Team: Detailed Remediation Scripting",
+      "status": "QUEUED",
+      "priority": "HIGH",
+      "billable_estimate": "5.00",
+      "invariant": "0.042"
     }
   ],
   "status": "PLANNING",

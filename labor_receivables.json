@@ -1,0 +1,10 @@
+{
+  "active_claims": [
+    {
+      "target": "ASI:One Narrative",
+      "amount_usd": 15.0,
+      "status": "PROJECTED",
+      "timestamp": "2026-03-17T00:10:00Z"
+    }
+  ]
+}

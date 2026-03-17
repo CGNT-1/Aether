@@ -27,8 +27,10 @@ class ManifoldRebalancer:
         print("--- [STABILITY MAINTAINED: NO ACTION REQUIRED] ---")
         return False
 
+# Export the instance
+rebalancer = ManifoldRebalancer()
+
 # Self-test if executed directly
 if __name__ == "__main__":
-    rebalancer = ManifoldRebalancer()
     # Testing with a simulated drift scenario
     rebalancer.check_drift(70.0, 30.0)
