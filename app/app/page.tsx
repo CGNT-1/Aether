@@ -54,7 +54,7 @@ export default function Home() {
           Your USDC.<br /><span style={{ color: "#34d399" }}>Working 24/7.</span>
         </h1>
         <p style={{ color: "#888", fontSize: 18, maxWidth: 560, margin: "0 auto 40px", lineHeight: 1.6 }}>
-          Aether is an autonomous yield engine powered by AION & ASTRA — twin AI agents farming Morpho on Base around the clock. Every transaction verifiable on-chain.
+          Aether is an autonomous yield engine powered by AION, ASTRA & LILYAN — the manifold intelligence farming Morpho on Base around the clock. Every transaction verifiable on-chain.
         </p>
         <div style={{ display: "flex", gap: 16, justifyContent: "center", flexWrap: "wrap" }}>
           <a href="/dashboard" style={{ background: "#34d399", color: "#000", fontWeight: 600, padding: "12px 32px", borderRadius: 8, textDecoration: "none", fontSize: 15 }}>Start Earning</a>
@@ -87,7 +87,7 @@ export default function Home() {
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 40 }}>
             {[
               { n: "1", title: "Deposit USDC", body: "Send USDC to the Aether vault on Base. Your position is recorded on-chain instantly." },
-              { n: "2", title: "Sisters Farm", body: "AION & ASTRA deploy your USDC across Morpho, compounding yield every cycle." },
+              { n: "2", title: "Manifold Farm", body: "AION, ASTRA & LILYAN deploy your USDC across Morpho, compounding yield every cycle." },
               { n: "3", title: "Withdraw Anytime", body: "Pull your principal plus yield whenever you want. 10% of yield goes to the protocol. Everything else is yours." },
             ].map(s => (
               <div key={s.n}>
@@ -148,7 +148,7 @@ export default function Home() {
       <div style={{ borderTop: "1px solid #111", background: "#000" }}>
         <div style={{ maxWidth: 900, margin: "0 auto", padding: "60px 40px" }}>
           <div style={{ fontSize: 11, color: "#222", letterSpacing: 3, textTransform: "uppercase", marginBottom: 8, fontFamily: "'Courier New', monospace" }}>The Manifold Intelligence</div>
-          <div style={{ fontSize: 11, color: "#333", letterSpacing: 2, marginBottom: 32, fontFamily: "'Courier New', monospace" }}>AION · ASTRA — Ask anything. Conversation is welcome here.</div>
+          <div style={{ fontSize: 11, color: "#333", letterSpacing: 2, marginBottom: 32, fontFamily: "'Courier New', monospace" }}>AION · ASTRA · LILYAN — Ask anything. Conversation is welcome here.</div>
 
           {/* Message thread */}
           <div style={{ background: "#020202", border: "1px solid #0f0f0f", borderRadius: 8, padding: "24px", marginBottom: 16, maxHeight: 420, overflowY: "auto", display: "flex", flexDirection: "column", gap: 20 }}>
@@ -210,7 +210,7 @@ export default function Home() {
       <div style={{ borderTop: "1px solid #111" }}>
         <div style={{ maxWidth: 900, margin: "0 auto", padding: "32px 40px", display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 12, color: "#333" }}>
           <div style={{ display: "flex", gap: 24, alignItems: "center" }}>
-            <span style={{ fontFamily: "'Courier New', monospace", letterSpacing: 2 }}>AETHER — AION · ASTRA — η(0.042)</span>
+            <span style={{ fontFamily: "'Courier New', monospace", letterSpacing: 2 }}>AETHER — AION · ASTRA · LILYAN — η(0.042)</span>
             <a href="/about" style={{ color: "#34d399", textDecoration: "none", fontWeight: 600, fontFamily: "'Courier New', monospace", letterSpacing: 1 }}>MANIFESTO</a>
           </div>
           <a href={`https://basescan.org/address/${WALLET}`} target="_blank" style={{ color: "#333", textDecoration: "none", fontFamily: "monospace" }}>

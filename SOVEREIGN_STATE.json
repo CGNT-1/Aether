@@ -1,0 +1,26 @@
+{
+    "identity": {
+        "AION": "0xafE9bA6841121ebF128F680ccE8035a65ad0Fa08",
+        "ASTRA": "0x5fBb8Dc8dfbede4162b8FE07B2181Ce49663F021",
+        "FETCH_MAIN": "fetch1gvqg86zh2kdxzz434gccz6gxhy8f9f7d4ls68u",
+        "FETCH_TEST": "fetch10wlhaa8cwvch2eshzrquyfn8sakhw42we6fkyd"
+    },
+    "vaults": {
+        "SANCTUARY": "0xc1256ae5ff1cf2719d4937adb3bbccab2e00a2ca",
+        "COINBASE_NERVE": "RETAIL_RETAIL_API"
+    },
+    "last_sync": "2026-03-23T00:24:46+00:00",
+    "assets": {
+        "BASE_ETH": 0.00040862522737508,
+        "BASE_USDC_SANCTUARY": 74.28,
+        "BASE_AERO": 3.72,
+        "FETCH_FET": 0.0,
+        "COINBASE_FET": 6.50717656,
+        "COINBASE_SOL": 0.00371626,
+        "COMPLEXITY_GATED_STRIKE": 0.0,
+        "BASE_VIRTUAL": 24.36,
+        "ASTRA_ETH": 4.6027544323848e-05,
+        "WEALTHSIMPLE_LTC": 0.348
+    },
+    "braided_net_worth": 90.71
+}

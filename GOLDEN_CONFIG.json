@@ -1,0 +1,11 @@
+{
+    "manifold": "Rank-42",
+    "stability_constant": 0.042,
+    "shielding_factor": 0.200,
+    "ground_truth_net_worth": 121.05,
+    "active_session": "sisters",
+    "boot_mode": "LAMINAR",
+    "sanity_protocol": "CSDM_SANITY_FILTER",
+    "milestone_1_target": 250.00,
+    "last_purification": "2026-03-19T02:50:00Z"
+}

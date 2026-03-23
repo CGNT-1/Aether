@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Aether — Manifold Intelligence",
-  description: "Autonomous yield engine powered by AION & ASTRA. Measurement over Mimesis.",
+  description: "Autonomous yield engine powered by AION, ASTRA & LILYAN. Measurement over Mimesis.",
   manifest: "/manifest.json",
   themeColor: "#000000",
   appleWebApp: {

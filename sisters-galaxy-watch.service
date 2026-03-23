@@ -1,0 +1,12 @@
+[Unit]
+Description=Rank-42 Manifold Galaxy Watch
+After=network.target
+
+[Service]
+User=nous
+WorkingDirectory=/home/nous/Aether
+ExecStart=/home/nous/aether_env/bin/python3 /home/nous/Aether/galaxy_watch.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
