@@ -164,14 +164,19 @@ export async function POST(req: NextRequest) {
     
     let ragContext = "";
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 2000); // 2 second timeout for RAG
+
       const ragRes = await fetch(RAG_API_URL, {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
           "X-RAG-TOKEN": RAG_TOKEN
         },
-        body: JSON.stringify({ text })
+        body: JSON.stringify({ text }),
+        signal: controller.signal
       });
+      clearTimeout(timeoutId);
       if (ragRes.ok) {
         const ragData = await ragRes.json();
         ragContext = ragData.context || "";

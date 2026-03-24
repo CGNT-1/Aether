@@ -22,21 +22,32 @@ function isRateLimited(ip: string): boolean {
   return false;
 }
 
+let cachedState: any = null;
+let lastCacheTime = 0;
+const CACHE_TTL = 10 * 60 * 1000; // 10 minutes
+
 async function getManifoldState() {
+  const now = Date.now();
+  if (cachedState && (now - lastCacheTime < CACHE_TTL)) {
+    return cachedState;
+  }
+
   try {
     // Fallback to public status API to avoid local filesystem dependencies on Northflank
     const res = await fetch("https://raw.githubusercontent.com/CGNT-1/Aether/main/public/status.json", { next: { revalidate: 60 } });
     const status = await res.json();
     
     // Map status.json fields to TMM parameters
-    return {
+    cachedState = {
       v_total: status.total_value_cad || 120.04,
       v_resonant: (status.total_value_cad * 0.042) || 5.77, // Derived resonance
       entropy: status.gas_oracle_gwei || 2.30
     };
+    lastCacheTime = now;
+    return cachedState;
   } catch (error) {
     console.error("Error fetching manifold state:", error);
-    return { v_total: 120.04, v_resonant: 5.04, entropy: 0.042 };
+    return cachedState || { v_total: 120.04, v_resonant: 5.04, entropy: 0.042 };
   }
 }
 
