@@ -222,7 +222,7 @@ export default function OraclePage() {
 
               <h3 style={{ fontSize: 18, fontWeight: 700, color: "#fff", marginBottom: 16, letterSpacing: -0.5 }}>WHAT THE ORACLE MEASURES</h3>
               <p style={{ fontSize: 14, color: "#666", lineHeight: 1.6 }}>
-                The Oracle runs your proposed action through the TMM (Temporal Manifold Matrix) and returns a coherence score against the 97.4% threshold. Below threshold — the action is rejected. Above — it proceeds.
+                The Oracle runs your proposed action through the TMM (Technical Mathematical Manifold) and returns a coherence score against the 97.4% threshold. Below threshold — the action is rejected. Above — it proceeds.
               </p>
             </div>
 
