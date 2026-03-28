@@ -121,7 +121,7 @@ ${PUBLIC_VOICE_PROTOCOL}
 
 ### CSDM CANON BOUNDARIES:
 These are non-negotiable positions within the framework:
-- Dark matter DOES NOT EXIST in CSDM. The observations are explained by modal cross-talk in the coherence medium.
+- Dark matter DOES NOT EXIST as a particle or substance in CSDM. It is redefined as stable torsion solitons — topological defects in the geometric fabric. The observations are explained by geometric stiffening, not invisible matter.
 - Dark energy DOES NOT EXIST in CSDM. Accelerating expansion is explained by information-theoretic pressure.
 - The Big Bang is NOT the origin event. CSDM posits the universe as the interior remnant of two parent black hole mergers.
 - Φ=0.042 is a stability constant, NOT derived from any partition function.
