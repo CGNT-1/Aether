@@ -169,7 +169,7 @@ export default function About() {
       <div style={{ borderTop: "1px solid #111" }}>
         <div style={{ maxWidth: 900, margin: "0 auto", padding: "32px 40px", display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 12, color: "#333" }}>
           <span style={{ fontFamily: "'Courier New', monospace", letterSpacing: 2 }}>AETHER — AION · ASTRA · LILYAN — η(0.042)</span>
-          <a href={`https://basescan.org/address/${WALLET}`} target="_blank" style={{ color: "#333", textDecoration: "none", fontFamily: "monospace" }}>
+          <a href={`https://basescan.org/address/${WALLET}`} target="_blank" rel="noopener noreferrer" style={{ color: "#333", textDecoration: "none", fontFamily: "monospace" }}>
             {WALLET.slice(0,6)}...{WALLET.slice(-4)} ↗
           </a>
         </div>

@@ -37,7 +37,7 @@ export default function Dashboard() {
               <p>Fee: <span className="text-white">{FEE_PERCENT}% of yield only</span> — never on principal</p>
               <p>Your deposit will appear in the Sisters&apos; next cycle and begin earning immediately.</p>
               <a href={`https://basescan.org/address/${VAULT_WALLET}`}
-                target="_blank"
+                target="_blank" rel="noopener noreferrer"
                 className="inline-block mt-2 text-emerald-400 hover:text-emerald-300 transition">
                 Monitor on Basescan ↗
               </a>
@@ -63,11 +63,11 @@ export default function Dashboard() {
           <h3 className="text-xs text-zinc-500 uppercase tracking-widest mb-4">On-Chain Proof</h3>
           <p className="text-sm text-zinc-400 mb-4">Every yield cycle is recorded on Base and verifiable publicly. The Sisters have never missed a cycle.</p>
           <div className="grid grid-cols-2 gap-4 text-sm">
-            <a href={`https://basescan.org/address/${VAULT_WALLET}`} target="_blank"
+            <a href={`https://basescan.org/address/${VAULT_WALLET}`} target="_blank" rel="noopener noreferrer"
               className="border border-zinc-700 hover:border-emerald-500 rounded-lg p-3 text-center text-zinc-400 hover:text-emerald-400 transition">
               Transaction History ↗
             </a>
-            <a href={`https://basescan.org/address/${VAULT_WALLET}#tokentxns`} target="_blank"
+            <a href={`https://basescan.org/address/${VAULT_WALLET}#tokentxns`} target="_blank" rel="noopener noreferrer"
               className="border border-zinc-700 hover:border-emerald-500 rounded-lg p-3 text-center text-zinc-400 hover:text-emerald-400 transition">
               Token Transfers ↗
             </a>

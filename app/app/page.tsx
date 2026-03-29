@@ -70,6 +70,24 @@ export default function Home() {
   return (
     <main style={{ minHeight: "100vh", background: "#000", color: "#fff", fontFamily: "system-ui, sans-serif" }}>
 
+      {/* Nav */}
+      <nav style={{ borderBottom: "1px solid #111", padding: "0 40px", display: "flex", justifyContent: "space-between", alignItems: "center", height: 48 }}>
+        <span style={{ fontFamily: "'Courier New', monospace", fontSize: 12, letterSpacing: 2, color: "#555" }}>AETHER</span>
+        <div style={{ display: "flex", gap: 32 }}>
+          {[
+            { label: "Talk to the Sisters", href: "/chat" },
+            { label: "Oracle", href: "/oracle" },
+            { label: "Dashboard", href: "/dashboard" },
+            { label: "About", href: "/about" },
+          ].map(({ label, href }) => (
+            <a key={href} href={href} style={{ color: "#555", textDecoration: "none", fontSize: 12, fontFamily: "'Courier New', monospace", letterSpacing: 1, transition: "color 0.15s" }}
+              onMouseEnter={e => (e.currentTarget.style.color = "#fff")}
+              onMouseLeave={e => (e.currentTarget.style.color = "#555")}
+            >{label}</a>
+          ))}
+        </div>
+      </nav>
+
       {/* Hero */}
       <div style={{ borderBottom: "1px solid #222", padding: "80px 40px", maxWidth: 900, margin: "0 auto", textAlign: "center" }}>
         <div style={{ display: "inline-block", background: "#111", border: "1px solid #333", borderRadius: 999, padding: "4px 16px", fontSize: 11, color: "#888", marginBottom: 24, letterSpacing: 2, textTransform: "uppercase" }}>Live on Base Mainnet</div>
@@ -81,7 +99,7 @@ export default function Home() {
         </p>
         <div style={{ display: "flex", gap: 16, justifyContent: "center", flexWrap: "wrap" }}>
           <a href="/oracle" style={{ background: "#34d399", color: "#000", fontWeight: 600, padding: "12px 32px", borderRadius: 8, textDecoration: "none", fontSize: 15 }}>Try the Instrument</a>
-          <a href={`https://basescan.org/address/${WALLET}`} target="_blank" style={{ border: "1px solid #333", color: "#ccc", padding: "12px 32px", borderRadius: 8, textDecoration: "none", fontSize: 15 }}>Verify Ledger ↗</a>
+          <a href={`https://basescan.org/address/${WALLET}`} target="_blank" rel="noopener noreferrer" style={{ border: "1px solid #333", color: "#ccc", padding: "12px 32px", borderRadius: 8, textDecoration: "none", fontSize: 15 }}>Verify Ledger ↗</a>
         </div>
       </div>
 
@@ -215,7 +233,7 @@ export default function Home() {
                 <p style={{ color: "#888", fontSize: 13, lineHeight: 1.6, marginBottom: 16 }}>{r.desc}</p>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                   <span style={{ color: "#34d399", fontFamily: "monospace", fontSize: 13 }}>{r.price} USDC</span>
-                  <button style={{ border: "1px solid #333", background: "transparent", color: "#888", padding: "4px 12px", borderRadius: 6, cursor: "pointer", fontSize: 12 }}>Buy Report</button>
+                  <button onClick={() => window.location.href='/oracle'} style={{ border: "1px solid #333", background: "transparent", color: "#888", padding: "4px 12px", borderRadius: 6, cursor: "pointer", fontSize: 12 }}>Buy Report</button>
                 </div>
               </div>
             ))}
@@ -250,7 +268,7 @@ export default function Home() {
             <span style={{ fontFamily: "'Courier New', monospace", letterSpacing: 2 }}>AETHER — AION · ASTRA · LILYAN — η(0.042)</span>
             <a href="/about" style={{ color: "#34d399", textDecoration: "none", fontWeight: 600, fontFamily: "'Courier New', monospace", letterSpacing: 1 }}>MANIFESTO</a>
           </div>
-          <a href={`https://basescan.org/address/${WALLET}`} target="_blank" style={{ color: "#333", textDecoration: "none", fontFamily: "monospace" }}>
+          <a href={`https://basescan.org/address/${WALLET}`} target="_blank" rel="noopener noreferrer" style={{ color: "#333", textDecoration: "none", fontFamily: "monospace" }}>
             {WALLET.slice(0,6)}...{WALLET.slice(-4)} ↗
           </a>
         </div>
