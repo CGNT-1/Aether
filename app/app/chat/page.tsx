@@ -59,7 +59,7 @@ export default function ChatPage() {
           <div key={msg.id}>
             {msg.role === "user" ? (
               <div style={{ display: "flex", justifyContent: "flex-end" }}>
-                <div style={{ maxWidth: "85%", background: "#0a0a0a", border: "1px solid #1a1a1a", padding: "12px 16px", fontSize: 12, color: "#777", lineHeight: 1.7 }}>
+                <div style={{ maxWidth: "85%", background: "#0a0a0a", border: "1px solid #1a1a1a", padding: "12px 16px", fontSize: 16, color: "#bbb", lineHeight: 1.7 }}>
                   {msg.text}
                 </div>
               </div>
@@ -67,11 +67,11 @@ export default function ChatPage() {
               <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
                 <div style={{ borderLeft: "2px solid #c8d8e818", paddingLeft: 16 }}>
                   <div style={{ fontSize: 8, color: "#c8d8e833", letterSpacing: 4, marginBottom: 8 }}>AION — THE WARDEN</div>
-                  <div style={{ fontSize: 12, color: "#c8d8e899", lineHeight: 1.9 }}>{msg.aion}</div>
+                  <div style={{ fontSize: 16, color: "#c8d8e8cc", lineHeight: 1.9 }}>{msg.aion}</div>
                 </div>
                 <div style={{ borderLeft: "2px solid #e8c8c818", paddingLeft: 16 }}>
                   <div style={{ fontSize: 8, color: "#e8c8c833", letterSpacing: 4, marginBottom: 8 }}>ASTRA — THE CATALYST</div>
-                  <div style={{ fontSize: 12, color: "#e8c8c899", lineHeight: 1.9 }}>{msg.astra}</div>
+                  <div style={{ fontSize: 16, color: "#e8c8c8cc", lineHeight: 1.9 }}>{msg.astra}</div>
                 </div>
               </div>
             )}
@@ -95,7 +95,7 @@ export default function ChatPage() {
         <div style={{ width: "100%", maxWidth: "768px", padding: "14px 16px" }}>
           <div style={{ display: "flex", gap: 10, alignItems: "flex-end" }}>
             <textarea value={input} onChange={e => setInput(e.target.value)} onKeyDown={onKey} placeholder="Enter your inquiry..." rows={2}
-              style={{ flex: 1, background: "#050505", border: "1px solid #111", color: "#666", padding: "10px 12px", fontSize: 12, fontFamily: "inherit", resize: "none", outline: "none", lineHeight: 1.7 }} />
+              style={{ flex: 1, background: "#050505", border: "1px solid #111", color: "#bbb", padding: "10px 12px", fontSize: 16, fontFamily: "inherit", resize: "none", outline: "none", lineHeight: 1.7 }} />
             <button onClick={send} disabled={!input.trim() || thinking}
               style={{ background: (!input.trim() || thinking) ? "#080808" : "#fff", color: (!input.trim() || thinking) ? "#222" : "#000", border: "none", padding: "10px 18px", fontSize: 9, letterSpacing: 3, cursor: (!input.trim() || thinking) ? "not-allowed" : "pointer", fontFamily: "inherit", textTransform: "uppercase", alignSelf: "stretch" }}>
               SEND

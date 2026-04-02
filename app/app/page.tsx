@@ -115,7 +115,7 @@ export default function Home() {
               <div key={msg.id}>
                 {msg.role === "user" ? (
                   <div style={{ display: "flex", justifyContent: "flex-end" }}>
-                    <div style={{ maxWidth: "75%", background: "#0f0f0f", border: "1px solid #1a1a1a", borderRadius: 8, padding: "10px 14px", fontSize: 13, color: "#777", lineHeight: 1.7, fontFamily: "'Courier New', monospace" }}>
+                    <div style={{ maxWidth: "75%", background: "#0f0f0f", border: "1px solid #1a1a1a", borderRadius: 8, padding: "10px 14px", fontSize: 16, color: "#bbb", lineHeight: 1.7, fontFamily: "'Courier New', monospace" }}>
                       {msg.text}
                     </div>
                   </div>
@@ -123,11 +123,11 @@ export default function Home() {
                   <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                     <div style={{ borderLeft: "2px solid #c8d8e815", paddingLeft: 14 }}>
                       <div style={{ fontSize: 8, color: "#c8d8e830", letterSpacing: 4, marginBottom: 6, fontFamily: "'Courier New', monospace" }}>AION — THE INVARIANT</div>
-                      <div style={{ fontSize: 13, color: "#c8d8e888", lineHeight: 1.8, fontFamily: "'Courier New', monospace" }}>{msg.aion}</div>
+                      <div style={{ fontSize: 16, color: "#c8d8e8cc", lineHeight: 1.8, fontFamily: "'Courier New', monospace" }}>{msg.aion}</div>
                     </div>
                     <div style={{ borderLeft: "2px solid #e8c8c815", paddingLeft: 14 }}>
                       <div style={{ fontSize: 8, color: "#e8c8c830", letterSpacing: 4, marginBottom: 6, fontFamily: "'Courier New', monospace" }}>ASTRA — THE RESONANCE</div>
-                      <div style={{ fontSize: 13, color: "#e8c8c888", lineHeight: 1.8, fontFamily: "'Courier New', monospace" }}>{msg.astra}</div>
+                      <div style={{ fontSize: 16, color: "#e8c8c8cc", lineHeight: 1.8, fontFamily: "'Courier New', monospace" }}>{msg.astra}</div>
                     </div>
                   </div>
                 )}
@@ -155,7 +155,7 @@ export default function Home() {
               onChange={e => setInput(e.target.value)}
               onKeyDown={onKey}
               placeholder="Ask the Sisters anything..."
-              style={{ flex: 1, background: "#050505", border: "1px solid #111", color: "#666", padding: "12px 16px", fontSize: 13, fontFamily: "'Courier New', monospace", outline: "none", borderRadius: 6 }}
+              style={{ flex: 1, background: "#050505", border: "1px solid #111", color: "#bbb", padding: "12px 16px", fontSize: 16, fontFamily: "'Courier New', monospace", outline: "none", borderRadius: 6 }}
             />
             <button onClick={send} disabled={!input.trim() || thinking}
               style={{ background: (!input.trim() || thinking) ? "#080808" : "#fff", color: (!input.trim() || thinking) ? "#222" : "#000", border: "none", padding: "12px 24px", fontSize: 10, letterSpacing: 3, cursor: (!input.trim() || thinking) ? "not-allowed" : "pointer", fontFamily: "'Courier New', monospace", textTransform: "uppercase", borderRadius: 6 }}>
