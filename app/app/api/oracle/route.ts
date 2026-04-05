@@ -1,95 +1,65 @@
 import { NextRequest, NextResponse } from "next/server";
 
-// Simple in-memory rate limiting (10 requests per minute per IP)
-const rateLimitMap = new Map<string, { count: number; lastReset: number }>();
-const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
-const MAX_REQUESTS = 10;
+/**
+ * Oracle Toll Proxy — root route
+ *
+ * GET  /api/oracle  →  oracle_toll GET  /info    (free — pricing, status, corpus info)
+ * POST /api/oracle  →  oracle_toll POST /analyze (0.25 USDC — full TMM coherence audit)
+ *
+ * For sub-routes (/query, /query/full, /health, etc.) see [...path]/route.ts
+ */
 
-function isRateLimited(ip: string): boolean {
-  const now = Date.now();
-  const entry = rateLimitMap.get(ip);
+const ORACLE_NODE = process.env.ORACLE_NODE_URL || "http://68.183.206.103:8890";
 
-  if (!entry || now - entry.lastReset > RATE_LIMIT_WINDOW) {
-    rateLimitMap.set(ip, { count: 1, lastReset: now });
-    return false;
+const FORWARD_REQUEST_HEADERS = ["content-type", "x-payment", "x-rag-token"];
+const FORWARD_RESPONSE_HEADERS = ["content-type", "x-oracle-version"];
+
+async function proxyTo(req: NextRequest, upstreamPath: string, method: string): Promise<NextResponse> {
+  const upstreamUrl = ORACLE_NODE + upstreamPath;
+
+  const forwardHeaders: Record<string, string> = {};
+  for (const key of FORWARD_REQUEST_HEADERS) {
+    const val = req.headers.get(key);
+    if (val) forwardHeaders[key] = val;
   }
 
-  if (entry.count >= MAX_REQUESTS) {
-    return true;
+  const fetchOptions: RequestInit = { method, headers: forwardHeaders };
+  if (method === "POST") {
+    fetchOptions.body = await req.text();
   }
 
-  entry.count++;
-  return false;
-}
-
-let cachedState: any = null;
-let lastCacheTime = 0;
-const CACHE_TTL = 10 * 60 * 1000; // 10 minutes
-
-async function getManifoldState() {
-  const now = Date.now();
-  if (cachedState && (now - lastCacheTime < CACHE_TTL)) {
-    return cachedState;
-  }
-
+  let upstream: Response;
   try {
-    // Fallback to public status API to avoid local filesystem dependencies on Northflank
-    const res = await fetch("https://raw.githubusercontent.com/CGNT-1/Aether/main/public/status.json", { next: { revalidate: 60 } });
-    const status = await res.json();
-    
-    // Map status.json fields to TMM parameters
-    cachedState = {
-      v_total: status.total_value_cad || 120.04,
-      v_resonant: (status.total_value_cad * 0.042) || 5.77, // Derived resonance
-      entropy: status.gas_oracle_gwei || 2.30
-    };
-    lastCacheTime = now;
-    return cachedState;
-  } catch (error) {
-    console.error("Error fetching manifold state:", error);
-    return cachedState || { v_total: 120.04, v_resonant: 5.04, entropy: 0.042 };
+    upstream = await fetch(upstreamUrl, fetchOptions);
+  } catch (err) {
+    console.error(`Oracle proxy: upstream unreachable at ${upstreamUrl}`, err);
+    return NextResponse.json(
+      { error: "Oracle node unreachable", node: "csdm-node", path: upstreamPath },
+      { status: 503 }
+    );
   }
+
+  const body = await upstream.arrayBuffer();
+  const responseHeaders = new Headers();
+  for (const key of FORWARD_RESPONSE_HEADERS) {
+    const val = upstream.headers.get(key);
+    if (val) responseHeaders.set(key, val);
+  }
+  const ct = upstream.headers.get("content-type");
+  if (ct) responseHeaders.set("content-type", ct);
+
+  return new NextResponse(body, {
+    status: upstream.status,
+    headers: responseHeaders,
+  });
 }
 
-export async function GET() {
-  const state = await getManifoldState();
-  return NextResponse.json(state);
+// GET /api/oracle → oracle_toll /info (free)
+export async function GET(req: NextRequest) {
+  return proxyTo(req, "/info", "GET");
 }
 
+// POST /api/oracle → oracle_toll /analyze (0.25 USDC, x402)
 export async function POST(req: NextRequest) {
-  const ip = req.headers.get("x-forwarded-for") || "unknown";
-  if (isRateLimited(ip)) {
-    return NextResponse.json({ error: "Too many requests. Limit is 10 per minute." }, { status: 429 });
-  }
-
-  try {
-    const body = await req.json();
-    
-    // Instead of local exec, we proxy to the public Oracle Toll /analyze endpoint
-    // This is the "Shortcut" to stability on Northflank
-    const ORACLE_TOLL_URL = "http://68.183.206.103:8890/analyze"; 
-    
-    const res = await fetch(ORACLE_TOLL_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        data: body.text || "No data provided",
-        context: "Web Interface Request"
-      })
-    });
-
-    if (!res.ok) throw new Error("Oracle Toll unreachable");
-    const result = await res.json();
-
-    return NextResponse.json(result);
-  } catch (error: any) {
-    console.error("Oracle API Proxy Error:", error);
-    return NextResponse.json({ 
-      error: "TMM Runtime Error", 
-      message: "External processing error. Fallback active.",
-      coherence: 0.042,
-      approved: false,
-      verdict: "DECOHERENT_SIGNAL"
-    }, { status: 500 });
-  }
+  return proxyTo(req, "/analyze", "POST");
 }
