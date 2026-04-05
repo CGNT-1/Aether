@@ -23,7 +23,7 @@ import { NextRequest, NextResponse } from "next/server";
  * of its own — access control lives in oracle_toll.
  */
 
-const ORACLE_NODE = process.env.ORACLE_NODE_URL || "http://68.183.206.103:8890";
+const ORACLE_NODE = process.env.ORACLE_NODE_URL || "http://68.183.206.103";
 
 // Headers to forward from the client to oracle_toll
 const FORWARD_REQUEST_HEADERS = ["content-type", "x-payment", "x-rag-token"];

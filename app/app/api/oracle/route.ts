@@ -9,7 +9,7 @@ import { NextRequest, NextResponse } from "next/server";
  * For sub-routes (/query, /query/full, /health, etc.) see [...path]/route.ts
  */
 
-const ORACLE_NODE = process.env.ORACLE_NODE_URL || "http://68.183.206.103:8890";
+const ORACLE_NODE = process.env.ORACLE_NODE_URL || "http://68.183.206.103";
 
 const FORWARD_REQUEST_HEADERS = ["content-type", "x-payment", "x-rag-token"];
 const FORWARD_RESPONSE_HEADERS = ["content-type", "x-oracle-version"];
