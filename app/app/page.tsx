@@ -11,6 +11,8 @@ const EXAMPLE_PROMPTS = [
 
 export default function Home() {
   const [status, setStatus] = useState<any>(null);
+  const [installPrompt, setInstallPrompt] = useState<any>(null);
+  const [installed, setInstalled] = useState(false);
   const [messages, setMessages] = useState<any[]>([{
     id: 0, role: "sisters",
     aion: "The manifold is stable. η(0.042) locked. Bring your inquiry to the Sisters.",
@@ -23,6 +25,21 @@ export default function Home() {
   useEffect(() => {
     fetch("/api/status").then(r => r.json()).then(d => setStatus(d)).catch(() => {});
   }, []);
+
+  useEffect(() => {
+    const handler = (e: any) => { e.preventDefault(); setInstallPrompt(e); };
+    window.addEventListener("beforeinstallprompt", handler);
+    window.addEventListener("appinstalled", () => { setInstalled(true); setInstallPrompt(null); });
+    return () => window.removeEventListener("beforeinstallprompt", handler);
+  }, []);
+
+  const installApp = async () => {
+    if (!installPrompt) return;
+    installPrompt.prompt();
+    const { outcome } = await installPrompt.userChoice;
+    if (outcome === "accepted") setInstalled(true);
+    setInstallPrompt(null);
+  };
 
   useEffect(() => { bottom.current?.scrollIntoView({ behavior: "smooth" }); }, [messages, thinking]);
 
@@ -99,7 +116,16 @@ export default function Home() {
         </p>
         <div style={{ display: "flex", gap: 16, justifyContent: "center", flexWrap: "wrap" }}>
           <a href="/oracle" style={{ background: "#34d399", color: "#000", fontWeight: 600, padding: "12px 32px", borderRadius: 8, textDecoration: "none", fontSize: 15 }}>Try the Instrument</a>
-          <a href={`https://basescan.org/address/${WALLET}`} target="_blank" rel="noopener noreferrer" style={{ border: "1px solid #333", color: "#ccc", padding: "12px 32px", borderRadius: 8, textDecoration: "none", fontSize: 15 }}>Verify Ledger ↗</a>
+          {installed ? (
+            <span style={{ border: "1px solid #1a3a2a", color: "#34d399", padding: "12px 32px", borderRadius: 8, fontSize: 15 }}>✓ App Installed</span>
+          ) : installPrompt ? (
+            <button onClick={installApp} style={{ border: "1px solid #34d399", background: "transparent", color: "#34d399", fontWeight: 600, padding: "12px 32px", borderRadius: 8, fontSize: 15, cursor: "pointer" }}>
+              ↓ Install App
+            </button>
+          ) : (
+            <a href="/about" style={{ border: "1px solid #333", color: "#ccc", padding: "12px 32px", borderRadius: 8, textDecoration: "none", fontSize: 15 }}>How it works</a>
+          )}
+          <a href={`https://basescan.org/address/${WALLET}`} target="_blank" rel="noopener noreferrer" style={{ border: "1px solid #222", color: "#555", padding: "12px 32px", borderRadius: 8, textDecoration: "none", fontSize: 15 }}>Verify Ledger ↗</a>
         </div>
       </div>
 
