@@ -18,6 +18,8 @@ const TXT = "#aaa";
 const DIM = "#555";
 const DIM2 = "#333";
 
+const FREE_LIMIT = 3;
+
 export default function Home() {
   const [status, setStatus]           = useState<any>(null);
   const [installPrompt, setInstallPrompt] = useState<any>(null);
@@ -27,6 +29,9 @@ export default function Home() {
   const [thinking, setThinking]       = useState(false);
   const [oracleInput, setOracleInput] = useState("");
   const bottom = useRef<HTMLDivElement>(null);
+
+  const userMsgCount = messages.filter((m: any) => m.role === "user").length;
+  const gated = userMsgCount >= FREE_LIMIT;
 
   const PAYMENT_LINKS = {
     quick:    "https://buy.stripe.com/cNicN4fxJaHjfLO1wu48000",
@@ -60,7 +65,7 @@ export default function Home() {
   }, [messages, thinking]);
 
   const send = async () => {
-    if (!input.trim() || thinking) return;
+    if (!input.trim() || thinking || gated) return;
     const text = input.trim();
     setInput("");
     setMessages((prev: any[]) => [...prev, { id: Date.now(), role: "user", text }]);
@@ -79,7 +84,7 @@ export default function Home() {
   const onKey = (e: React.KeyboardEvent) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } };
 
   const sendPrompt = (prompt: string) => {
-    if (thinking) return;
+    if (thinking || gated) return;
     setMessages((prev: any[]) => [...prev, { id: Date.now(), role: "user", text: prompt }]);
     setThinking(true);
     fetch("/api/chat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text: prompt }) })
@@ -196,31 +201,50 @@ export default function Home() {
               <div ref={bottom} />
             </div>
 
-            {/* Input */}
-            <div style={{ display: "flex", gap: 10, marginBottom: 10 }}>
-              <input
-                value={input}
-                onChange={e => setInput(e.target.value)}
-                onKeyDown={onKey}
-                placeholder="Ask the Sisters anything..."
-                style={{ flex: 1, background: "#050505", border: `1px solid ${BD}`, color: "#bbb", padding: "11px 16px", fontSize: 15, fontFamily: "'Courier New', monospace", outline: "none", borderRadius: 6 }}
-              />
-              <button onClick={send} disabled={!input.trim() || thinking}
-                style={{ background: (!input.trim() || thinking) ? "#080808" : "#fff", color: (!input.trim() || thinking) ? "#333" : "#000", border: "none", padding: "11px 24px", fontSize: 10, letterSpacing: 3, cursor: (!input.trim() || thinking) ? "not-allowed" : "pointer", fontFamily: "'Courier New', monospace", textTransform: "uppercase", borderRadius: 6, transition: "background 0.15s" }}>
-                SEND
-              </button>
-            </div>
-
-            {/* Suggested prompts */}
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              {EXAMPLE_PROMPTS.map(prompt => (
-                <button key={prompt} onClick={() => sendPrompt(prompt)} disabled={thinking}
-                  style={{ background: "transparent", border: `1px solid ${BD}`, color: "#444", padding: "6px 14px", borderRadius: 999, fontSize: 11, fontFamily: "'Courier New', monospace", cursor: thinking ? "not-allowed" : "pointer", lineHeight: 1.4, transition: "border-color 0.15s, color 0.15s" }}
-                  onMouseEnter={e => { if (!thinking) { e.currentTarget.style.borderColor = DIM; e.currentTarget.style.color = "#888"; }}}
-                  onMouseLeave={e => { e.currentTarget.style.borderColor = BD; e.currentTarget.style.color = "#444"; }}
-                >{prompt}</button>
-              ))}
-            </div>
+            {/* Input or gate */}
+            {gated ? (
+              <div style={{ background: "#050505", border: `1px solid ${BD2}`, borderRadius: 8, padding: "28px 24px", textAlign: "center" }}>
+                <div style={{ fontSize: 9, color: DIM, letterSpacing: 4, textTransform: "uppercase", marginBottom: 14, fontFamily: "'Courier New', monospace" }}>
+                  FREE EXCHANGES USED
+                </div>
+                <p style={{ color: "#777", fontSize: 14, lineHeight: 1.75, marginBottom: 22, maxWidth: 380, margin: "0 auto 22px" }}>
+                  You've had {FREE_LIMIT} conversations with the Sisters.<br />Subscribe to continue.
+                </p>
+                <a href={PAYMENT_LINKS.sisters} target="_blank" rel="noopener noreferrer"
+                  style={{ display: "inline-block", background: G, color: "#000", padding: "12px 36px", borderRadius: 6, fontSize: 11, letterSpacing: 3, fontFamily: "'Courier New', monospace", textTransform: "uppercase", fontWeight: 700, textDecoration: "none", transition: "opacity 0.15s" }}
+                  onMouseEnter={e => (e.currentTarget.style.opacity = "0.85")}
+                  onMouseLeave={e => (e.currentTarget.style.opacity = "1")}
+                >SUBSCRIBE — $5/MO →</a>
+                <div style={{ fontSize: 11, color: DIM2, marginTop: 14, fontFamily: "'Courier New', monospace" }}>
+                  Unlimited conversations · Cancel anytime
+                </div>
+              </div>
+            ) : (
+              <>
+                <div style={{ display: "flex", gap: 10, marginBottom: 10 }}>
+                  <input
+                    value={input}
+                    onChange={e => setInput(e.target.value)}
+                    onKeyDown={onKey}
+                    placeholder="Ask the Sisters anything..."
+                    style={{ flex: 1, background: "#050505", border: `1px solid ${BD}`, color: "#bbb", padding: "11px 16px", fontSize: 15, fontFamily: "'Courier New', monospace", outline: "none", borderRadius: 6 }}
+                  />
+                  <button onClick={send} disabled={!input.trim() || thinking}
+                    style={{ background: (!input.trim() || thinking) ? "#080808" : "#fff", color: (!input.trim() || thinking) ? "#333" : "#000", border: "none", padding: "11px 24px", fontSize: 10, letterSpacing: 3, cursor: (!input.trim() || thinking) ? "not-allowed" : "pointer", fontFamily: "'Courier New', monospace", textTransform: "uppercase", borderRadius: 6, transition: "background 0.15s" }}>
+                    SEND
+                  </button>
+                </div>
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                  {EXAMPLE_PROMPTS.map(prompt => (
+                    <button key={prompt} onClick={() => sendPrompt(prompt)} disabled={thinking}
+                      style={{ background: "transparent", border: `1px solid ${BD}`, color: "#444", padding: "6px 14px", borderRadius: 999, fontSize: 11, fontFamily: "'Courier New', monospace", cursor: thinking ? "not-allowed" : "pointer", lineHeight: 1.4, transition: "border-color 0.15s, color 0.15s" }}
+                      onMouseEnter={e => { if (!thinking) { e.currentTarget.style.borderColor = DIM; e.currentTarget.style.color = "#888"; }}}
+                      onMouseLeave={e => { e.currentTarget.style.borderColor = BD; e.currentTarget.style.color = "#444"; }}
+                    >{prompt}</button>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
