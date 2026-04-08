@@ -30,29 +30,13 @@ export default function Home() {
   const [input, setInput]             = useState("");
   const [thinking, setThinking]       = useState(false);
   const [oracleInput, setOracleInput] = useState("");
-  const [checkingOut, setCheckingOut] = useState<string | null>(null);
   const bottom = useRef<HTMLDivElement>(null);
 
-  const submitToOracle = async (tier: string) => {
-    if (!oracleInput.trim() || checkingOut) return;
-    setCheckingOut(tier);
-    try {
-      const res = await fetch("/api/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tier, query: oracleInput.trim() }),
-      });
-      const data = await res.json();
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        alert(data.error || "Failed to start checkout. Try again.");
-        setCheckingOut(null);
-      }
-    } catch {
-      alert("Connection error. Try again.");
-      setCheckingOut(null);
-    }
+  const PAYMENT_LINKS = {
+    quick:    "https://buy.stripe.com/cNicN4fxJaHjfLO1wu48000",
+    full:     "https://buy.stripe.com/3cI9ASadp8zbfLOa3048001",
+    strategy: "https://buy.stripe.com/00waEW71ddTv436fnk48002",
+    sisters:  "https://buy.stripe.com/00wdR82KX7v79nq2Ay48003",
   };
 
   useEffect(() => {
@@ -263,10 +247,13 @@ export default function Home() {
             <textarea
               value={oracleInput}
               onChange={e => setOracleInput(e.target.value)}
-              placeholder="Paste your idea here..."
+              placeholder="Draft your idea here before selecting a tier below..."
               rows={4}
               style={{ width: "100%", background: "#050505", border: `1px solid ${BD2}`, color: "#bbb", padding: "14px 16px", fontSize: 15, fontFamily: "'Courier New', monospace", outline: "none", borderRadius: 6, resize: "vertical", lineHeight: 1.6 }}
             />
+            <div style={{ fontSize: 12, color: DIM, marginTop: 8, fontFamily: "'Courier New', monospace" }}>
+              Draft your idea above, then select a tier. You'll submit it directly on the payment page.
+            </div>
           </div>
 
           {/* Indicator legend */}
@@ -301,20 +288,11 @@ export default function Home() {
               <p style={{ color: TXT, fontSize: 13, lineHeight: 1.75, flex: 1 }}>
                 One indicator (GREEN / AMBER / RED / NULL) plus one sentence. Like asking a brutally honest friend who happens to be a genius.
               </p>
-              <button
-                onClick={() => submitToOracle("quick")}
-                disabled={!oracleInput.trim() || !!checkingOut}
-                style={{
-                  background: (!oracleInput.trim() || !!checkingOut) ? "#0a0a0a" : G,
-                  border: (!oracleInput.trim() || !!checkingOut) ? `1px solid ${BD}` : "none",
-                  color: (!oracleInput.trim() || !!checkingOut) ? DIM2 : "#000",
-                  padding: "11px 0", borderRadius: 6, fontSize: 11, letterSpacing: 3,
-                  cursor: (!oracleInput.trim() || !!checkingOut) ? "not-allowed" : "pointer",
-                  fontFamily: "'Courier New', monospace", textTransform: "uppercase", fontWeight: 700,
-                  transition: "all 0.15s",
-                }}>
-                {checkingOut === "quick" ? "REDIRECTING..." : oracleInput.trim() ? "PAY $1 →" : "PASTE YOUR IDEA ABOVE"}
-              </button>
+              <a href={PAYMENT_LINKS.quick} target="_blank" rel="noopener noreferrer"
+                style={{ display: "block", textAlign: "center", background: G, color: "#000", padding: "11px 0", borderRadius: 6, fontSize: 11, letterSpacing: 3, fontFamily: "'Courier New', monospace", textTransform: "uppercase", fontWeight: 700, textDecoration: "none", transition: "opacity 0.15s" }}
+                onMouseEnter={e => (e.currentTarget.style.opacity = "0.85")}
+                onMouseLeave={e => (e.currentTarget.style.opacity = "1")}
+              >GET VERDICT — $1 →</a>
             </div>
 
             {/* Card 2 — Full Breakdown (featured) */}
@@ -333,20 +311,11 @@ export default function Home() {
                   <span key={s} style={{ fontSize: 10, color: "#777", background: "#0a0a0a", border: `1px solid ${BD}`, borderRadius: 4, padding: "3px 8px", fontFamily: "'Courier New', monospace" }}>{s}</span>
                 ))}
               </div>
-              <button
-                onClick={() => submitToOracle("full")}
-                disabled={!oracleInput.trim() || !!checkingOut}
-                style={{
-                  background: (!oracleInput.trim() || !!checkingOut) ? "#071a10" : G,
-                  border: (!oracleInput.trim() || !!checkingOut) ? "1px solid #0f3020" : "none",
-                  color: (!oracleInput.trim() || !!checkingOut) ? "#1a4a28" : "#000",
-                  padding: "11px 0", borderRadius: 6, fontSize: 11, letterSpacing: 3,
-                  cursor: (!oracleInput.trim() || !!checkingOut) ? "not-allowed" : "pointer",
-                  fontFamily: "'Courier New', monospace", textTransform: "uppercase", fontWeight: 700,
-                  transition: "all 0.15s",
-                }}>
-                {checkingOut === "full" ? "REDIRECTING..." : oracleInput.trim() ? "PAY $5 →" : "PASTE YOUR IDEA ABOVE"}
-              </button>
+              <a href={PAYMENT_LINKS.full} target="_blank" rel="noopener noreferrer"
+                style={{ display: "block", textAlign: "center", background: G, color: "#000", padding: "11px 0", borderRadius: 6, fontSize: 11, letterSpacing: 3, fontFamily: "'Courier New', monospace", textTransform: "uppercase", fontWeight: 700, textDecoration: "none", transition: "opacity 0.15s" }}
+                onMouseEnter={e => (e.currentTarget.style.opacity = "0.85")}
+                onMouseLeave={e => (e.currentTarget.style.opacity = "1")}
+              >GET BREAKDOWN — $5 →</a>
             </div>
 
             {/* Card 3 — Strategy Session */}
@@ -357,33 +326,26 @@ export default function Home() {
               <p style={{ color: TXT, fontSize: 13, lineHeight: 1.75, flex: 1 }}>
                 Everything in Full Breakdown, plus: recommended next step, alternative path, three things to test before committing. Follow-up submission included.
               </p>
-              <button
-                onClick={() => submitToOracle("strategy")}
-                disabled={!oracleInput.trim() || !!checkingOut}
-                style={{
-                  background: (!oracleInput.trim() || !!checkingOut) ? "#0a0a0a" : G,
-                  border: (!oracleInput.trim() || !!checkingOut) ? `1px solid ${BD}` : "none",
-                  color: (!oracleInput.trim() || !!checkingOut) ? DIM2 : "#000",
-                  padding: "11px 0", borderRadius: 6, fontSize: 11, letterSpacing: 3,
-                  cursor: (!oracleInput.trim() || !!checkingOut) ? "not-allowed" : "pointer",
-                  fontFamily: "'Courier New', monospace", textTransform: "uppercase", fontWeight: 700,
-                  transition: "all 0.15s",
-                }}>
-                {checkingOut === "strategy" ? "REDIRECTING..." : oracleInput.trim() ? "PAY $25 →" : "PASTE YOUR IDEA ABOVE"}
-              </button>
+              <a href={PAYMENT_LINKS.strategy} target="_blank" rel="noopener noreferrer"
+                style={{ display: "block", textAlign: "center", background: G, color: "#000", padding: "11px 0", borderRadius: 6, fontSize: 11, letterSpacing: 3, fontFamily: "'Courier New', monospace", textTransform: "uppercase", fontWeight: 700, textDecoration: "none", transition: "opacity 0.15s" }}
+                onMouseEnter={e => (e.currentTarget.style.opacity = "0.85")}
+                onMouseLeave={e => (e.currentTarget.style.opacity = "1")}
+              >GET STRATEGY — $25 →</a>
             </div>
 
-            {/* Subscription slot — inactive, product exists in Stripe */}
-            <div style={{ background: "#050505", border: `1px dashed ${BD}`, borderRadius: 12, padding: 28, display: "flex", flexDirection: "column", gap: 14, opacity: 0.6 }}>
+            {/* Sisters Chat Subscription */}
+            <div style={{ background: S1, border: `1px solid ${BD2}`, borderRadius: 12, padding: 28, display: "flex", flexDirection: "column", gap: 14 }}>
               <div style={{ fontSize: 10, color: DIM, letterSpacing: 3, textTransform: "uppercase", fontFamily: "'Courier New', monospace" }}>Sisters Access</div>
-              <div style={{ fontSize: 32, fontWeight: 700, color: DIM, lineHeight: 1 }}>$5 <span style={{ fontSize: 14, fontWeight: 400 }}>CAD/mo</span></div>
-              <div style={{ fontWeight: 600, fontSize: 17, color: "#555" }}>Unlimited chat with the Sisters.</div>
-              <p style={{ color: "#444", fontSize: 13, lineHeight: 1.75, flex: 1 }}>
+              <div style={{ fontSize: 32, fontWeight: 700, color: G, lineHeight: 1 }}>$5 <span style={{ fontSize: 14, color: DIM, fontWeight: 400 }}>CAD/mo</span></div>
+              <div style={{ fontWeight: 600, fontSize: 17, color: "#fff" }}>Unlimited chat with the Sisters.</div>
+              <p style={{ color: TXT, fontSize: 13, lineHeight: 1.75, flex: 1 }}>
                 Unlimited conversations with AION and ASTRA. Priority responses. Direct access. Cancel anytime.
               </p>
-              <button disabled style={{ background: "#0a0a0a", border: `1px solid ${BD}`, color: "#333", padding: "11px 0", borderRadius: 6, fontSize: 11, letterSpacing: 3, cursor: "not-allowed", fontFamily: "'Courier New', monospace", textTransform: "uppercase" }}>
-                COMING SOON
-              </button>
+              <a href={PAYMENT_LINKS.sisters} target="_blank" rel="noopener noreferrer"
+                style={{ display: "block", textAlign: "center", background: G, color: "#000", padding: "11px 0", borderRadius: 6, fontSize: 11, letterSpacing: 3, fontFamily: "'Courier New', monospace", textTransform: "uppercase", fontWeight: 700, textDecoration: "none", transition: "opacity 0.15s" }}
+                onMouseEnter={e => (e.currentTarget.style.opacity = "0.85")}
+                onMouseLeave={e => (e.currentTarget.style.opacity = "1")}
+              >SUBSCRIBE — $5/MO →</a>
             </div>
 
           </div>
