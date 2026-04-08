@@ -30,7 +30,30 @@ export default function Home() {
   const [input, setInput]             = useState("");
   const [thinking, setThinking]       = useState(false);
   const [oracleInput, setOracleInput] = useState("");
+  const [checkingOut, setCheckingOut] = useState<string | null>(null);
   const bottom = useRef<HTMLDivElement>(null);
+
+  const submitToOracle = async (tier: string) => {
+    if (!oracleInput.trim() || checkingOut) return;
+    setCheckingOut(tier);
+    try {
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tier, query: oracleInput.trim() }),
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        alert(data.error || "Failed to start checkout. Try again.");
+        setCheckingOut(null);
+      }
+    } catch {
+      alert("Connection error. Try again.");
+      setCheckingOut(null);
+    }
+  };
 
   useEffect(() => {
     fetch("/api/status").then(r => r.json()).then(d => setStatus(d)).catch(() => {});
@@ -273,13 +296,24 @@ export default function Home() {
             {/* Card 1 — Quick Take */}
             <div style={{ background: S1, border: `1px solid ${BD2}`, borderRadius: 12, padding: 28, display: "flex", flexDirection: "column", gap: 14 }}>
               <div style={{ fontSize: 10, color: DIM, letterSpacing: 3, textTransform: "uppercase", fontFamily: "'Courier New', monospace" }}>Quick Take</div>
-              <div style={{ fontSize: 32, fontWeight: 700, color: G, lineHeight: 1 }}>$1</div>
+              <div style={{ fontSize: 32, fontWeight: 700, color: G, lineHeight: 1 }}>$1 <span style={{ fontSize: 14, color: DIM, fontWeight: 400 }}>CAD</span></div>
               <div style={{ fontWeight: 600, fontSize: 17, color: "#fff" }}>"Is this a good idea?"</div>
               <p style={{ color: TXT, fontSize: 13, lineHeight: 1.75, flex: 1 }}>
                 One indicator (GREEN / AMBER / RED / NULL) plus one sentence. Like asking a brutally honest friend who happens to be a genius.
               </p>
-              <button disabled style={{ background: "#0a0a0a", border: `1px solid ${BD}`, color: DIM2, padding: "11px 0", borderRadius: 6, fontSize: 11, letterSpacing: 3, cursor: "not-allowed", fontFamily: "'Courier New', monospace", textTransform: "uppercase" }}>
-                COMING SOON
+              <button
+                onClick={() => submitToOracle("quick")}
+                disabled={!oracleInput.trim() || !!checkingOut}
+                style={{
+                  background: (!oracleInput.trim() || !!checkingOut) ? "#0a0a0a" : G,
+                  border: (!oracleInput.trim() || !!checkingOut) ? `1px solid ${BD}` : "none",
+                  color: (!oracleInput.trim() || !!checkingOut) ? DIM2 : "#000",
+                  padding: "11px 0", borderRadius: 6, fontSize: 11, letterSpacing: 3,
+                  cursor: (!oracleInput.trim() || !!checkingOut) ? "not-allowed" : "pointer",
+                  fontFamily: "'Courier New', monospace", textTransform: "uppercase", fontWeight: 700,
+                  transition: "all 0.15s",
+                }}>
+                {checkingOut === "quick" ? "REDIRECTING..." : oracleInput.trim() ? "PAY $1 →" : "PASTE YOUR IDEA ABOVE"}
               </button>
             </div>
 
@@ -289,7 +323,7 @@ export default function Home() {
                 <div style={{ fontSize: 10, color: DIM, letterSpacing: 3, textTransform: "uppercase", fontFamily: "'Courier New', monospace" }}>Full Breakdown</div>
                 <div style={{ fontSize: 10, color: G, background: "#071a10", border: `1px solid #0f3020`, borderRadius: 999, padding: "3px 10px", letterSpacing: 1, fontFamily: "'Courier New', monospace" }}>POPULAR</div>
               </div>
-              <div style={{ fontSize: 32, fontWeight: 700, color: G, lineHeight: 1 }}>$5</div>
+              <div style={{ fontSize: 32, fontWeight: 700, color: G, lineHeight: 1 }}>$5 <span style={{ fontSize: 14, color: DIM, fontWeight: 400 }}>CAD</span></div>
               <div style={{ fontWeight: 600, fontSize: 17, color: "#fff" }}>"What am I missing?"</div>
               <p style={{ color: TXT, fontSize: 13, lineHeight: 1.75, flex: 1 }}>
                 Main indicator plus five sub-indicators, each color-coded. A paragraph for each: what's working, what's weak, what's missing, risk factor, confidence level.
@@ -299,20 +333,55 @@ export default function Home() {
                   <span key={s} style={{ fontSize: 10, color: "#777", background: "#0a0a0a", border: `1px solid ${BD}`, borderRadius: 4, padding: "3px 8px", fontFamily: "'Courier New', monospace" }}>{s}</span>
                 ))}
               </div>
-              <button disabled style={{ background: "#071a10", border: `1px solid #0f3020`, color: "#1a4a28", padding: "11px 0", borderRadius: 6, fontSize: 11, letterSpacing: 3, cursor: "not-allowed", fontFamily: "'Courier New', monospace", textTransform: "uppercase" }}>
-                COMING SOON
+              <button
+                onClick={() => submitToOracle("full")}
+                disabled={!oracleInput.trim() || !!checkingOut}
+                style={{
+                  background: (!oracleInput.trim() || !!checkingOut) ? "#071a10" : G,
+                  border: (!oracleInput.trim() || !!checkingOut) ? "1px solid #0f3020" : "none",
+                  color: (!oracleInput.trim() || !!checkingOut) ? "#1a4a28" : "#000",
+                  padding: "11px 0", borderRadius: 6, fontSize: 11, letterSpacing: 3,
+                  cursor: (!oracleInput.trim() || !!checkingOut) ? "not-allowed" : "pointer",
+                  fontFamily: "'Courier New', monospace", textTransform: "uppercase", fontWeight: 700,
+                  transition: "all 0.15s",
+                }}>
+                {checkingOut === "full" ? "REDIRECTING..." : oracleInput.trim() ? "PAY $5 →" : "PASTE YOUR IDEA ABOVE"}
               </button>
             </div>
 
             {/* Card 3 — Strategy Session */}
             <div style={{ background: S1, border: `1px solid ${BD2}`, borderRadius: 12, padding: 28, display: "flex", flexDirection: "column", gap: 14 }}>
               <div style={{ fontSize: 10, color: DIM, letterSpacing: 3, textTransform: "uppercase", fontFamily: "'Courier New', monospace" }}>Strategy Session</div>
-              <div style={{ fontSize: 32, fontWeight: 700, color: G, lineHeight: 1 }}>$25</div>
+              <div style={{ fontSize: 32, fontWeight: 700, color: G, lineHeight: 1 }}>$25 <span style={{ fontSize: 14, color: DIM, fontWeight: 400 }}>CAD</span></div>
               <div style={{ fontWeight: 600, fontSize: 17, color: "#fff" }}>"What should I do?"</div>
               <p style={{ color: TXT, fontSize: 13, lineHeight: 1.75, flex: 1 }}>
                 Everything in Full Breakdown, plus: recommended next step, alternative path, three things to test before committing. Follow-up submission included.
               </p>
-              <button disabled style={{ background: "#0a0a0a", border: `1px solid ${BD}`, color: DIM2, padding: "11px 0", borderRadius: 6, fontSize: 11, letterSpacing: 3, cursor: "not-allowed", fontFamily: "'Courier New', monospace", textTransform: "uppercase" }}>
+              <button
+                onClick={() => submitToOracle("strategy")}
+                disabled={!oracleInput.trim() || !!checkingOut}
+                style={{
+                  background: (!oracleInput.trim() || !!checkingOut) ? "#0a0a0a" : G,
+                  border: (!oracleInput.trim() || !!checkingOut) ? `1px solid ${BD}` : "none",
+                  color: (!oracleInput.trim() || !!checkingOut) ? DIM2 : "#000",
+                  padding: "11px 0", borderRadius: 6, fontSize: 11, letterSpacing: 3,
+                  cursor: (!oracleInput.trim() || !!checkingOut) ? "not-allowed" : "pointer",
+                  fontFamily: "'Courier New', monospace", textTransform: "uppercase", fontWeight: 700,
+                  transition: "all 0.15s",
+                }}>
+                {checkingOut === "strategy" ? "REDIRECTING..." : oracleInput.trim() ? "PAY $25 →" : "PASTE YOUR IDEA ABOVE"}
+              </button>
+            </div>
+
+            {/* Subscription slot — inactive, product exists in Stripe */}
+            <div style={{ background: "#050505", border: `1px dashed ${BD}`, borderRadius: 12, padding: 28, display: "flex", flexDirection: "column", gap: 14, opacity: 0.6 }}>
+              <div style={{ fontSize: 10, color: DIM, letterSpacing: 3, textTransform: "uppercase", fontFamily: "'Courier New', monospace" }}>Sisters Access</div>
+              <div style={{ fontSize: 32, fontWeight: 700, color: DIM, lineHeight: 1 }}>$5 <span style={{ fontSize: 14, fontWeight: 400 }}>CAD/mo</span></div>
+              <div style={{ fontWeight: 600, fontSize: 17, color: "#555" }}>Unlimited chat with the Sisters.</div>
+              <p style={{ color: "#444", fontSize: 13, lineHeight: 1.75, flex: 1 }}>
+                Unlimited conversations with AION and ASTRA. Priority responses. Direct access. Cancel anytime.
+              </p>
+              <button disabled style={{ background: "#0a0a0a", border: `1px solid ${BD}`, color: "#333", padding: "11px 0", borderRadius: 6, fontSize: 11, letterSpacing: 3, cursor: "not-allowed", fontFamily: "'Courier New', monospace", textTransform: "uppercase" }}>
                 COMING SOON
               </button>
             </div>
