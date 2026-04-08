@@ -148,7 +148,7 @@ export default function Home() {
         <div style={{ background: "#050505", borderTop: `1px solid ${BD}`, borderBottom: `1px solid ${BD}` }}>
           <div style={{ maxWidth: 900, margin: "0 auto", padding: "48px 40px" }}>
             <div style={{ fontSize: 11, color: G, letterSpacing: 3, textTransform: "uppercase", marginBottom: 6, fontFamily: "'Courier New', monospace" }}>Talk to the Sisters</div>
-            <div style={{ fontSize: 11, color: DIM2, letterSpacing: 1, marginBottom: 28, fontFamily: "'Courier New', monospace" }}>AION (Logic) · ASTRA (Catalyst) — Ask anything. Conversation is welcome here.</div>
+            <div style={{ fontSize: 11, color: DIM2, letterSpacing: 1, marginBottom: 28, fontFamily: "'Courier New', monospace" }}>AION (Logic) · ASTRA (Catalyst) — Three free exchanges. Conversation is welcome here.</div>
 
             {/* Character cards */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 20 }}>
@@ -162,8 +162,8 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Message thread */}
-            <div style={{ background: "#020202", border: `1px solid ${G}40`, borderRadius: 8, padding: "20px", marginBottom: 12, maxHeight: 360, overflowY: "auto", display: "flex", flexDirection: "column", gap: 16 }}>
+            {/* Message thread — only shown when there are messages */}
+            {(messages.length > 0 || thinking) && <div style={{ background: "#020202", border: `1px solid ${BD}`, borderRadius: 8, padding: "20px", marginBottom: 12, maxHeight: 360, overflowY: "auto", display: "flex", flexDirection: "column", gap: 16 }}>
               {messages.map(msg => (
                 <div key={msg.id}>
                   {msg.role === "user" ? (
@@ -199,7 +199,7 @@ export default function Home() {
                 </div>
               )}
               <div ref={bottom} />
-            </div>
+            </div>}
 
             {/* Input or gate */}
             {gated ? (
@@ -327,6 +327,7 @@ export default function Home() {
                 Main indicator plus five sub-indicators, each color-coded. A paragraph for each: what's working, what's weak, what's missing, risk factor, confidence level.
               </p>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                <div style={{ width: "100%", fontSize: 9, color: DIM, letterSpacing: 2, textTransform: "uppercase", marginBottom: 2, fontFamily: "'Courier New', monospace" }}>Analysis Dimensions</div>
                 {["Signal Stability", "Turbulence", "Change Rate", "Completion", "Curvature"].map(s => (
                   <span key={s} style={{ fontSize: 10, color: "#777", background: "#0a0a0a", border: `1px solid ${BD}`, borderRadius: 4, padding: "3px 8px", fontFamily: "'Courier New', monospace" }}>{s}</span>
                 ))}
