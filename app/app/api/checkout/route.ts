@@ -83,7 +83,7 @@ export async function POST(req: NextRequest) {
         type: "text",
         text: { minimum_length: 10 },
       }],
-      success_url: `${siteUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${siteUrl}/oracle/result?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${siteUrl}/#oracle`,
     });
 
