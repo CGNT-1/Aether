@@ -182,7 +182,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ received: true });
   }
 
-  // Pre-compute verdict and cache it — async, fire and don't block Stripe
+  const customerEmail = session.customer_details?.email || session.customer_email || null;
+
+  // Pre-compute verdict, cache it, and email the customer — async, fire and don't block Stripe
   (async () => {
     try {
       const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || "");
@@ -198,8 +200,25 @@ export async function POST(req: NextRequest) {
 
       cacheVerdict(sessionId, { tier, query, verdict });
       console.log(`[webhook] Verdict pre-computed and cached for session ${sessionId}`);
+
+      // Email the verdict to the customer
+      if (customerEmail) {
+        const emailServiceUrl = process.env.ORACLE_EMAIL_SERVICE_URL || "http://68.183.206.103:8006";
+        const emailRes = await fetch(`${emailServiceUrl}/send-verdict-email`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ customer_email: customerEmail, tier, query, verdict }),
+        });
+        if (emailRes.ok) {
+          console.log(`[webhook] Verdict emailed to ${customerEmail}`);
+        } else {
+          console.error(`[webhook] Email send failed: ${emailRes.status} ${await emailRes.text()}`);
+        }
+      } else {
+        console.warn(`[webhook] No customer email on session ${sessionId} — skipping email`);
+      }
     } catch (err) {
-      console.error(`[webhook] Failed to pre-compute verdict for ${sessionId}:`, err);
+      console.error(`[webhook] Failed for session ${sessionId}:`, err);
     }
   })();
 
