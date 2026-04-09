@@ -63,7 +63,7 @@ export async function POST(req: NextRequest) {
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-02-24.acacia" });
     const t = TIERS[tier];
-    const origin = req.headers.get("origin") || "https://42sisters.ai";
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://42sisters.ai";
 
     const metadata: Record<string, string> = {
       tier,
@@ -85,8 +85,8 @@ export async function POST(req: NextRequest) {
       }],
       mode: "payment",
       metadata,
-      success_url: `${origin}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${origin}/#oracle`,
+      success_url: `${siteUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${siteUrl}/#oracle`,
     });
 
     return NextResponse.json({ url: session.url });

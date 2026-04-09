@@ -33,11 +33,37 @@ export default function Home() {
   const userMsgCount = messages.filter((m: any) => m.role === "user").length;
   const gated = userMsgCount >= FREE_LIMIT;
 
-  const PAYMENT_LINKS = {
-    quick:    "https://buy.stripe.com/cNicN4fxJaHjfLO1wu48000",
-    full:     "https://buy.stripe.com/3cI9ASadp8zbfLOa3048001",
-    strategy: "https://buy.stripe.com/00waEW71ddTv436fnk48002",
-    sisters:  "https://buy.stripe.com/00wdR82KX7v79nq2Ay48003",
+  // Sisters subscription uses a static Payment Link (recurring — no query needed)
+  const SISTERS_LINK = "https://buy.stripe.com/00wdR82KX7v79nq2Ay48003";
+
+  // Oracle tiers go through dynamic checkout to capture the query
+  const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
+  const [checkoutError, setCheckoutError] = useState("");
+
+  const handleOracleCheckout = async (tier: string) => {
+    if (!oracleInput.trim() || oracleInput.trim().length < 10) {
+      setCheckoutError("Please describe your idea in the box above before selecting a tier.");
+      return;
+    }
+    setCheckoutError("");
+    setCheckoutLoading(tier);
+    try {
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tier, query: oracleInput.trim() }),
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        setCheckoutError(data.error || "Failed to start checkout. Please try again.");
+        setCheckoutLoading(null);
+      }
+    } catch {
+      setCheckoutError("Connection error. Please try again.");
+      setCheckoutLoading(null);
+    }
   };
 
   useEffect(() => {
@@ -210,7 +236,7 @@ export default function Home() {
                 <p style={{ color: "#777", fontSize: 14, lineHeight: 1.75, marginBottom: 22, maxWidth: 380, margin: "0 auto 22px" }}>
                   You've had {FREE_LIMIT} conversations with the Sisters.<br />Subscribe to continue.
                 </p>
-                <a href={PAYMENT_LINKS.sisters} target="_blank" rel="noopener noreferrer"
+                <a href={SISTERS_LINK} target="_blank" rel="noopener noreferrer"
                   style={{ display: "inline-block", background: G, color: "#000", padding: "12px 36px", borderRadius: 6, fontSize: 11, letterSpacing: 3, fontFamily: "'Courier New', monospace", textTransform: "uppercase", fontWeight: 700, textDecoration: "none", transition: "opacity 0.15s" }}
                   onMouseEnter={e => (e.currentTarget.style.opacity = "0.85")}
                   onMouseLeave={e => (e.currentTarget.style.opacity = "1")}
@@ -272,8 +298,13 @@ export default function Home() {
               style={{ width: "100%", background: "#050505", border: `1px solid ${BD2}`, color: "#bbb", padding: "14px 16px", fontSize: 15, fontFamily: "'Courier New', monospace", outline: "none", borderRadius: 6, resize: "vertical", lineHeight: 1.6 }}
             />
             <div style={{ fontSize: 12, color: DIM, marginTop: 8, fontFamily: "'Courier New', monospace" }}>
-              Draft your idea above, then select a tier. You'll submit it directly on the payment page.
+              Describe your idea above — it will be analyzed by the Oracle after payment completes.
             </div>
+            {checkoutError && (
+              <div style={{ marginTop: 10, padding: "10px 14px", background: "#1a0808", border: "1px solid #3a1010", borderRadius: 6, fontSize: 13, color: "#ff6666", fontFamily: "'Courier New', monospace" }}>
+                {checkoutError}
+              </div>
+            )}
           </div>
 
           {/* Indicator legend */}
@@ -308,11 +339,11 @@ export default function Home() {
               <p style={{ color: TXT, fontSize: 13, lineHeight: 1.75, flex: 1 }}>
                 One indicator (GREEN / AMBER / RED / NULL) plus one sentence. Like asking a brutally honest friend who happens to be a genius.
               </p>
-              <a href={PAYMENT_LINKS.quick} target="_blank" rel="noopener noreferrer"
-                style={{ display: "block", textAlign: "center", background: G, color: "#000", padding: "11px 0", borderRadius: 6, fontSize: 11, letterSpacing: 3, fontFamily: "'Courier New', monospace", textTransform: "uppercase", fontWeight: 700, textDecoration: "none", transition: "opacity 0.15s" }}
-                onMouseEnter={e => (e.currentTarget.style.opacity = "0.85")}
-                onMouseLeave={e => (e.currentTarget.style.opacity = "1")}
-              >GET VERDICT — $1 →</a>
+              <button
+                onClick={() => handleOracleCheckout("quick")}
+                disabled={checkoutLoading !== null}
+                style={{ display: "block", width: "100%", textAlign: "center", background: checkoutLoading === "quick" ? "#1a3a2a" : G, color: checkoutLoading === "quick" ? G : "#000", padding: "11px 0", borderRadius: 6, fontSize: 11, letterSpacing: 3, fontFamily: "'Courier New', monospace", textTransform: "uppercase", fontWeight: 700, border: "none", cursor: checkoutLoading !== null ? "not-allowed" : "pointer", transition: "opacity 0.15s" }}
+              >{checkoutLoading === "quick" ? "REDIRECTING..." : "GET VERDICT — $1 →"}</button>
             </div>
 
             {/* Card 2 — Full Breakdown (featured) */}
@@ -332,11 +363,11 @@ export default function Home() {
                   <span key={s} style={{ fontSize: 10, color: "#777", background: "#0a0a0a", border: `1px solid ${BD}`, borderRadius: 4, padding: "3px 8px", fontFamily: "'Courier New', monospace" }}>{s}</span>
                 ))}
               </div>
-              <a href={PAYMENT_LINKS.full} target="_blank" rel="noopener noreferrer"
-                style={{ display: "block", textAlign: "center", background: G, color: "#000", padding: "11px 0", borderRadius: 6, fontSize: 11, letterSpacing: 3, fontFamily: "'Courier New', monospace", textTransform: "uppercase", fontWeight: 700, textDecoration: "none", transition: "opacity 0.15s" }}
-                onMouseEnter={e => (e.currentTarget.style.opacity = "0.85")}
-                onMouseLeave={e => (e.currentTarget.style.opacity = "1")}
-              >GET BREAKDOWN — $5 →</a>
+              <button
+                onClick={() => handleOracleCheckout("full")}
+                disabled={checkoutLoading !== null}
+                style={{ display: "block", width: "100%", textAlign: "center", background: checkoutLoading === "full" ? "#1a3a2a" : G, color: checkoutLoading === "full" ? G : "#000", padding: "11px 0", borderRadius: 6, fontSize: 11, letterSpacing: 3, fontFamily: "'Courier New', monospace", textTransform: "uppercase", fontWeight: 700, border: "none", cursor: checkoutLoading !== null ? "not-allowed" : "pointer", transition: "opacity 0.15s" }}
+              >{checkoutLoading === "full" ? "REDIRECTING..." : "GET BREAKDOWN — $5 →"}</button>
             </div>
 
             {/* Card 3 — Strategy Session */}
@@ -347,11 +378,11 @@ export default function Home() {
               <p style={{ color: TXT, fontSize: 13, lineHeight: 1.75, flex: 1 }}>
                 Everything in Full Breakdown, plus: recommended next step, alternative path, three things to test before committing. Follow-up submission included.
               </p>
-              <a href={PAYMENT_LINKS.strategy} target="_blank" rel="noopener noreferrer"
-                style={{ display: "block", textAlign: "center", background: G, color: "#000", padding: "11px 0", borderRadius: 6, fontSize: 11, letterSpacing: 3, fontFamily: "'Courier New', monospace", textTransform: "uppercase", fontWeight: 700, textDecoration: "none", transition: "opacity 0.15s" }}
-                onMouseEnter={e => (e.currentTarget.style.opacity = "0.85")}
-                onMouseLeave={e => (e.currentTarget.style.opacity = "1")}
-              >GET STRATEGY — $25 →</a>
+              <button
+                onClick={() => handleOracleCheckout("strategy")}
+                disabled={checkoutLoading !== null}
+                style={{ display: "block", width: "100%", textAlign: "center", background: checkoutLoading === "strategy" ? "#1a3a2a" : G, color: checkoutLoading === "strategy" ? G : "#000", padding: "11px 0", borderRadius: 6, fontSize: 11, letterSpacing: 3, fontFamily: "'Courier New', monospace", textTransform: "uppercase", fontWeight: 700, border: "none", cursor: checkoutLoading !== null ? "not-allowed" : "pointer", transition: "opacity 0.15s" }}
+              >{checkoutLoading === "strategy" ? "REDIRECTING..." : "GET STRATEGY — $25 →"}</button>
             </div>
 
             {/* Sisters Chat Subscription */}
@@ -362,7 +393,7 @@ export default function Home() {
               <p style={{ color: TXT, fontSize: 13, lineHeight: 1.75, flex: 1 }}>
                 Unlimited conversations with AION and ASTRA. Priority responses. Direct access. Cancel anytime.
               </p>
-              <a href={PAYMENT_LINKS.sisters} target="_blank" rel="noopener noreferrer"
+              <a href={SISTERS_LINK} target="_blank" rel="noopener noreferrer"
                 style={{ display: "block", textAlign: "center", background: G, color: "#000", padding: "11px 0", borderRadius: 6, fontSize: 11, letterSpacing: 3, fontFamily: "'Courier New', monospace", textTransform: "uppercase", fontWeight: 700, textDecoration: "none", transition: "opacity 0.15s" }}
                 onMouseEnter={e => (e.currentTarget.style.opacity = "0.85")}
                 onMouseLeave={e => (e.currentTarget.style.opacity = "1")}
