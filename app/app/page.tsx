@@ -27,7 +27,8 @@ export default function Home() {
   const [messages, setMessages]       = useState<any[]>([]);
   const [input, setInput]             = useState("");
   const [thinking, setThinking]       = useState(false);
-  const bottom = useRef<HTMLDivElement>(null);
+  const bottom      = useRef<HTMLDivElement>(null);
+  const chatBoxRef  = useRef<HTMLDivElement>(null);
 
   const userMsgCount = messages.filter((m: any) => m.role === "user").length;
   const gated = userMsgCount >= FREE_LIMIT;
@@ -80,9 +81,11 @@ export default function Home() {
     setInstallPrompt(null);
   };
 
-  // Only auto-scroll after user interaction — prevents page loading at bottom
+  // Scroll chat box internally — never jump the page
   useEffect(() => {
-    if (messages.length > 1 || thinking) bottom.current?.scrollIntoView({ behavior: "smooth" });
+    if ((messages.length > 1 || thinking) && chatBoxRef.current) {
+      chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
+    }
   }, [messages, thinking]);
 
   const send = async () => {
@@ -184,7 +187,7 @@ export default function Home() {
             </div>
 
             {/* Message thread — only shown when there are messages */}
-            {(messages.length > 0 || thinking) && <div style={{ background: "#020202", border: `1px solid ${BD}`, borderRadius: 8, padding: "20px", marginBottom: 12, maxHeight: 360, overflowY: "auto", display: "flex", flexDirection: "column", gap: 16 }}>
+            {(messages.length > 0 || thinking) && <div ref={chatBoxRef} style={{ background: "#020202", border: `1px solid ${BD}`, borderRadius: 8, padding: "20px", marginBottom: 12, maxHeight: 360, overflowY: "auto", display: "flex", flexDirection: "column", gap: 16 }}>
               {messages.map(msg => (
                 <div key={msg.id}>
                   {msg.role === "user" ? (
