@@ -27,10 +27,7 @@ export default function Home() {
   const [messages, setMessages]       = useState<any[]>([]);
   const [input, setInput]             = useState("");
   const [thinking, setThinking]       = useState(false);
-  const [oracleInput, setOracleInput] = useState("");
   const bottom = useRef<HTMLDivElement>(null);
-  const oracleErrorRef = useRef<HTMLDivElement>(null);
-  const oracleTextareaRef = useRef<HTMLTextAreaElement>(null);
 
   const userMsgCount = messages.filter((m: any) => m.role === "user").length;
   const gated = userMsgCount >= FREE_LIMIT;
@@ -38,25 +35,18 @@ export default function Home() {
   // Sisters subscription uses a static Payment Link (recurring — no query needed)
   const SISTERS_LINK = "https://buy.stripe.com/00wdR82KX7v79nq2Ay48003";
 
-  // Oracle tiers go through dynamic checkout to capture the query
+  // Oracle tiers go through dynamic checkout
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
   const [checkoutError, setCheckoutError] = useState("");
 
   const handleOracleCheckout = async (tier: string) => {
-    if (!oracleInput.trim() || oracleInput.trim().length < 10) {
-      setCheckoutError("Paste your idea in the box above first — the Oracle needs something to analyze.");
-      // Scroll textarea into view and focus it so user knows what to do
-      oracleTextareaRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
-      setTimeout(() => oracleTextareaRef.current?.focus(), 400);
-      return;
-    }
     setCheckoutError("");
     setCheckoutLoading(tier);
     try {
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tier, query: oracleInput.trim() }),
+        body: JSON.stringify({ tier }),
       });
       const data = await res.json();
       if (data.url) {
@@ -293,25 +283,11 @@ export default function Home() {
             The Oracle doesn't sugarcoat. Paste your idea. Get an honest verdict.
           </p>
 
-          {/* Intake box */}
-          <div style={{ marginBottom: 40 }}>
-            <textarea
-              ref={oracleTextareaRef}
-              value={oracleInput}
-              onChange={e => { setOracleInput(e.target.value); if (e.target.value.trim().length >= 10) setCheckoutError(""); }}
-              placeholder="Draft your idea here before selecting a tier below..."
-              rows={4}
-              style={{ width: "100%", background: "#050505", border: `1px solid ${checkoutError ? "#ff4444" : BD2}`, color: "#bbb", padding: "14px 16px", fontSize: 15, fontFamily: "'Courier New', monospace", outline: "none", borderRadius: 6, resize: "vertical", lineHeight: 1.6, transition: "border-color 0.2s" }}
-            />
-            <div style={{ fontSize: 12, color: DIM, marginTop: 8, fontFamily: "'Courier New', monospace" }}>
-              Describe your idea above — it will be analyzed by the Oracle after payment completes.
+          {checkoutError && (
+            <div style={{ marginBottom: 24, padding: "10px 14px", background: "#1a0808", border: "1px solid #3a1010", borderRadius: 6, fontSize: 13, color: "#ff6666", fontFamily: "'Courier New', monospace" }}>
+              ⚠ {checkoutError}
             </div>
-            {checkoutError && (
-              <div ref={oracleErrorRef} style={{ marginTop: 10, padding: "10px 14px", background: "#1a0808", border: "1px solid #3a1010", borderRadius: 6, fontSize: 13, color: "#ff6666", fontFamily: "'Courier New', monospace" }}>
-                ⚠ {checkoutError}
-              </div>
-            )}
-          </div>
+          )}
 
           {/* Indicator legend */}
           <div style={{ background: S1, border: `1px solid ${BD2}`, borderRadius: 8, padding: "20px 24px", marginBottom: 40 }}>

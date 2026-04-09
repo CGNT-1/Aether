@@ -47,13 +47,10 @@ function packQuery(query: string): Record<string, string> {
 
 export async function POST(req: NextRequest) {
   try {
-    const { tier, query } = await req.json();
+    const { tier } = await req.json();
 
     if (!tier || !TIERS[tier]) {
       return NextResponse.json({ error: "Invalid tier. Use: quick, full, strategy" }, { status: 400 });
-    }
-    if (!query || query.trim().length < 10) {
-      return NextResponse.json({ error: "Query too short. Tell us about your idea." }, { status: 400 });
     }
 
     const stripeKey = getStripeKey();
@@ -64,11 +61,6 @@ export async function POST(req: NextRequest) {
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-02-24.acacia" });
     const t = TIERS[tier];
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://42sisters.ai";
-
-    const metadata: Record<string, string> = {
-      tier,
-      ...packQuery(query.trim())
-    };
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
@@ -84,7 +76,13 @@ export async function POST(req: NextRequest) {
         quantity: 1,
       }],
       mode: "payment",
-      metadata,
+      metadata: { tier },
+      custom_fields: [{
+        key: "idea",
+        label: { type: "custom", custom: "Describe your idea" },
+        type: "text",
+        text: { minimum_length: 10, maximum_length: 2000 },
+      }],
       success_url: `${siteUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${siteUrl}/#oracle`,
     });

@@ -173,9 +173,9 @@ export async function POST(req: NextRequest) {
   }
 
   const sessionId = session.id;
-  const metadata = session.metadata as Record<string, string>;
-  const tier = metadata?.tier as "quick" | "full" | "strategy";
-  const query = unpackQuery(metadata || {});
+  const tier = (session.metadata?.tier || "") as "quick" | "full" | "strategy";
+  const field = session.custom_fields?.find((f: any) => f.key === "idea");
+  const query = field?.text?.value || unpackQuery((session.metadata as Record<string, string>) || {});
 
   if (!query || !tier || !VERDICT_PROMPT[tier]) {
     console.error("Webhook: missing query or tier in session", sessionId);

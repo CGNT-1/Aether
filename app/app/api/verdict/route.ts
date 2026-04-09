@@ -5,6 +5,14 @@ import fs from "fs";
 import path from "path";
 import { cacheVerdict, getCachedVerdict } from "../../lib/verdictCache";
 
+function extractQuery(session: Stripe.Checkout.Session): string {
+  // Primary: read from Stripe custom_fields (new flow)
+  const field = session.custom_fields?.find((f: any) => f.key === "idea");
+  if (field?.text?.value) return field.text.value;
+  // Fallback: unpack from metadata (legacy sessions)
+  return unpackQuery((session.metadata as Record<string, string>) || {});
+}
+
 function getStripeKey(): string {
   try {
     const keyPath = path.join(process.env.HOME || "/home/nous", ".credentials", "stripe_secret.key");
@@ -159,9 +167,8 @@ export async function GET(req: NextRequest) {
       return NextResponse.json(cached);
     }
 
-    const metadata = session.metadata as Record<string, string>;
-    const tier = metadata.tier as "quick" | "full" | "strategy";
-    const query = unpackQuery(metadata);
+    const tier = (session.metadata?.tier || "") as "quick" | "full" | "strategy";
+    const query = extractQuery(session);
 
     if (!query || !tier || !VERDICT_PROMPT[tier]) {
       return NextResponse.json({ error: "Session data corrupted." }, { status: 400 });
