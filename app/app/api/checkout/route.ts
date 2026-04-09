@@ -81,7 +81,7 @@ export async function POST(req: NextRequest) {
         key: "idea",
         label: { type: "custom", custom: "Describe your idea" },
         type: "text",
-        text: { minimum_length: 10, maximum_length: 2000 },
+        text: { minimum_length: 10 },
       }],
       success_url: `${siteUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${siteUrl}/#oracle`,
