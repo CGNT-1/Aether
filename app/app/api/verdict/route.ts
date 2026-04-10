@@ -162,7 +162,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Check cache first — browser-close resilience
-    const cached = getCachedVerdict(sessionId);
+    const cached = await getCachedVerdict(sessionId);
     if (cached) {
       return NextResponse.json(cached);
     }
@@ -193,7 +193,7 @@ export async function GET(req: NextRequest) {
     }
 
     const payload = { tier, query, verdict };
-    cacheVerdict(sessionId, payload);
+    await cacheVerdict(sessionId, payload);
     return NextResponse.json(payload);
   } catch (err: any) {
     console.error("Verdict error:", err);

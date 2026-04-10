@@ -198,7 +198,7 @@ export async function POST(req: NextRequest) {
       const responseText = result.response.text();
       const verdict = JSON.parse(responseText);
 
-      cacheVerdict(sessionId, { tier, query, verdict });
+      await cacheVerdict(sessionId, { tier, query, verdict });
       console.log(`[webhook] Verdict pre-computed and cached for session ${sessionId}`);
 
       // Email the verdict to the customer

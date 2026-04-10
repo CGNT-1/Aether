@@ -1,31 +1,24 @@
-import fs from "fs";
-import path from "path";
+const ORACLE_TOLL_URL = process.env.ORACLE_TOLL_URL || "http://68.183.206.103:8889";
 
-const CACHE_PATH = path.join(process.env.HOME || "/home/nous", "oracle_verdict_cache.json");
-
-function readCache(): Record<string, any> {
+export async function cacheVerdict(sessionId: string, payload: any): Promise<void> {
   try {
-    return JSON.parse(fs.readFileSync(CACHE_PATH, "utf8"));
-  } catch {
-    return {};
-  }
-}
-
-function writeCache(cache: Record<string, any>): void {
-  try {
-    fs.writeFileSync(CACHE_PATH, JSON.stringify(cache, null, 2));
+    await fetch(`${ORACLE_TOLL_URL}/cache/${sessionId}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...payload, cached_at: new Date().toISOString() }),
+    });
   } catch {
     // Non-fatal — cache miss on next request, Gemini re-runs
   }
 }
 
-export function cacheVerdict(sessionId: string, payload: any): void {
-  const cache = readCache();
-  cache[sessionId] = { ...payload, cached_at: new Date().toISOString() };
-  writeCache(cache);
-}
-
-export function getCachedVerdict(sessionId: string): any | null {
-  const cache = readCache();
-  return cache[sessionId] || null;
+export async function getCachedVerdict(sessionId: string): Promise<any | null> {
+  try {
+    const res = await fetch(`${ORACLE_TOLL_URL}/cache/${sessionId}`);
+    if (res.status === 404) return null;
+    if (!res.ok) return null;
+    return await res.json();
+  } catch {
+    return null;
+  }
 }

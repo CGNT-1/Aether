@@ -47,10 +47,14 @@ function packQuery(query: string): Record<string, string> {
 
 export async function POST(req: NextRequest) {
   try {
-    const { tier } = await req.json();
+    const { tier, query } = await req.json();
 
     if (!tier || !TIERS[tier]) {
       return NextResponse.json({ error: "Invalid tier. Use: quick, full, strategy" }, { status: 400 });
+    }
+
+    if (!query || typeof query !== "string" || !query.trim()) {
+      return NextResponse.json({ error: "A question or idea is required." }, { status: 400 });
     }
 
     const stripeKey = getStripeKey();
@@ -76,13 +80,7 @@ export async function POST(req: NextRequest) {
         quantity: 1,
       }],
       mode: "payment",
-      metadata: { tier },
-      custom_fields: [{
-        key: "idea",
-        label: { type: "custom", custom: "Describe your idea" },
-        type: "text",
-        text: { minimum_length: 10 },
-      }],
+      metadata: { tier, ...packQuery(query.trim()) },
       success_url: `${siteUrl}/oracle/result?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${siteUrl}/#oracle`,
     });

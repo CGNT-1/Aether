@@ -19,6 +19,8 @@ const DIM = "#555";
 const DIM2 = "#333";
 
 const FREE_LIMIT = 3;
+const GOLD = "#d4af37";
+const GOLD_DIM = "#8a6f1a";
 
 export default function Home() {
   const [status, setStatus]           = useState<any>(null);
@@ -39,15 +41,33 @@ export default function Home() {
   // Oracle tiers go through dynamic checkout
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
   const [checkoutError, setCheckoutError] = useState("");
+  const [oracleQuery, setOracleQuery] = useState("");
+  const [bridgeEmail, setBridgeEmail]     = useState("");
+  const [bridgeSubmit, setBridgeSubmit]   = useState<"idle"|"sending"|"done"|"error">("idle");
 
-  const handleOracleCheckout = async (tier: string) => {
+  const submitBridgeEmail = async () => {
+    if (!bridgeEmail.includes("@")) return;
+    setBridgeSubmit("sending");
+    try {
+      const res = await fetch("/api/bridge-notify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: bridgeEmail }),
+      });
+      setBridgeSubmit(res.ok ? "done" : "error");
+    } catch {
+      setBridgeSubmit("error");
+    }
+  };
+
+  const handleOracleCheckout = async (tier: string, query: string) => {
     setCheckoutError("");
     setCheckoutLoading(tier);
     try {
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tier }),
+        body: JSON.stringify({ tier, query }),
       });
       const data = await res.json();
       if (data.url) {
@@ -130,11 +150,12 @@ export default function Home() {
             { label: "Oracle",  href: "#oracle"  },
             { label: "Services",href: "#services" },
             { label: "Status",  href: "#status"  },
-          ].map(({ label, href }) => (
+            { label: "Bridge",  href: "#bridge", gold: true },
+          ].map(({ label, href, gold }: any) => (
             <a key={href} href={href}
-              style={{ color: DIM, textDecoration: "none", fontSize: 12, fontFamily: "'Courier New', monospace", letterSpacing: 1, transition: "color 0.15s" }}
-              onMouseEnter={e => (e.currentTarget.style.color = "#fff")}
-              onMouseLeave={e => (e.currentTarget.style.color = DIM)}
+              style={{ color: gold ? GOLD_DIM : DIM, textDecoration: "none", fontSize: 12, fontFamily: "'Courier New', monospace", letterSpacing: 1, transition: "color 0.15s" }}
+              onMouseEnter={e => (e.currentTarget.style.color = gold ? GOLD : "#fff")}
+              onMouseLeave={e => (e.currentTarget.style.color = gold ? GOLD_DIM : DIM)}
             >{label}</a>
           ))}
         </div>
@@ -313,6 +334,18 @@ export default function Home() {
             </div>
           </div>
 
+          {/* Query textarea */}
+          <div style={{ marginBottom: 32 }}>
+            <div style={{ fontSize: 10, color: DIM, letterSpacing: 3, textTransform: "uppercase", marginBottom: 10, fontFamily: "'Courier New', monospace" }}>Your question or idea</div>
+            <textarea
+              value={oracleQuery}
+              onChange={e => setOracleQuery(e.target.value)}
+              placeholder="Describe your idea, question, or situation. The Oracle reads everything."
+              rows={5}
+              style={{ width: "100%", boxSizing: "border-box", background: "#0a0a0a", border: `1px solid ${oracleQuery.trim() ? G : BD2}`, borderRadius: 8, color: "#e8e8e8", fontSize: 14, fontFamily: "'Courier New', monospace", padding: "14px 16px", resize: "vertical", outline: "none", lineHeight: 1.6, transition: "border-color 0.15s" }}
+            />
+          </div>
+
           {/* Tier cards */}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 16 }}>
 
@@ -325,9 +358,9 @@ export default function Home() {
                 One indicator (GREEN / AMBER / RED / NULL) plus one sentence. Like asking a brutally honest friend who happens to be a genius.
               </p>
               <button
-                onClick={() => handleOracleCheckout("quick")}
-                disabled={checkoutLoading !== null}
-                style={{ display: "block", width: "100%", textAlign: "center", background: checkoutLoading === "quick" ? "#1a3a2a" : G, color: checkoutLoading === "quick" ? G : "#000", padding: "11px 0", borderRadius: 6, fontSize: 11, letterSpacing: 3, fontFamily: "'Courier New', monospace", textTransform: "uppercase", fontWeight: 700, border: "none", cursor: checkoutLoading !== null ? "not-allowed" : "pointer", transition: "opacity 0.15s" }}
+                onClick={() => handleOracleCheckout("quick", oracleQuery)}
+                disabled={checkoutLoading !== null || !oracleQuery.trim()}
+                style={{ display: "block", width: "100%", textAlign: "center", background: checkoutLoading === "quick" ? "#1a3a2a" : G, color: checkoutLoading === "quick" ? G : "#000", padding: "11px 0", borderRadius: 6, fontSize: 11, letterSpacing: 3, fontFamily: "'Courier New', monospace", textTransform: "uppercase", fontWeight: 700, border: "none", cursor: (checkoutLoading !== null || !oracleQuery.trim()) ? "not-allowed" : "pointer", opacity: !oracleQuery.trim() ? 0.45 : 1, transition: "opacity 0.15s" }}
               >{checkoutLoading === "quick" ? "REDIRECTING..." : "GET VERDICT — $1 →"}</button>
             </div>
 
@@ -349,9 +382,9 @@ export default function Home() {
                 ))}
               </div>
               <button
-                onClick={() => handleOracleCheckout("full")}
-                disabled={checkoutLoading !== null}
-                style={{ display: "block", width: "100%", textAlign: "center", background: checkoutLoading === "full" ? "#1a3a2a" : G, color: checkoutLoading === "full" ? G : "#000", padding: "11px 0", borderRadius: 6, fontSize: 11, letterSpacing: 3, fontFamily: "'Courier New', monospace", textTransform: "uppercase", fontWeight: 700, border: "none", cursor: checkoutLoading !== null ? "not-allowed" : "pointer", transition: "opacity 0.15s" }}
+                onClick={() => handleOracleCheckout("full", oracleQuery)}
+                disabled={checkoutLoading !== null || !oracleQuery.trim()}
+                style={{ display: "block", width: "100%", textAlign: "center", background: checkoutLoading === "full" ? "#1a3a2a" : G, color: checkoutLoading === "full" ? G : "#000", padding: "11px 0", borderRadius: 6, fontSize: 11, letterSpacing: 3, fontFamily: "'Courier New', monospace", textTransform: "uppercase", fontWeight: 700, border: "none", cursor: (checkoutLoading !== null || !oracleQuery.trim()) ? "not-allowed" : "pointer", opacity: !oracleQuery.trim() ? 0.45 : 1, transition: "opacity 0.15s" }}
               >{checkoutLoading === "full" ? "REDIRECTING..." : "GET BREAKDOWN — $5 →"}</button>
             </div>
 
@@ -364,9 +397,9 @@ export default function Home() {
                 Everything in Full Breakdown, plus: recommended next step, alternative path, three things to test before committing. Follow-up submission included.
               </p>
               <button
-                onClick={() => handleOracleCheckout("strategy")}
-                disabled={checkoutLoading !== null}
-                style={{ display: "block", width: "100%", textAlign: "center", background: checkoutLoading === "strategy" ? "#1a3a2a" : G, color: checkoutLoading === "strategy" ? G : "#000", padding: "11px 0", borderRadius: 6, fontSize: 11, letterSpacing: 3, fontFamily: "'Courier New', monospace", textTransform: "uppercase", fontWeight: 700, border: "none", cursor: checkoutLoading !== null ? "not-allowed" : "pointer", transition: "opacity 0.15s" }}
+                onClick={() => handleOracleCheckout("strategy", oracleQuery)}
+                disabled={checkoutLoading !== null || !oracleQuery.trim()}
+                style={{ display: "block", width: "100%", textAlign: "center", background: checkoutLoading === "strategy" ? "#1a3a2a" : G, color: checkoutLoading === "strategy" ? G : "#000", padding: "11px 0", borderRadius: 6, fontSize: 11, letterSpacing: 3, fontFamily: "'Courier New', monospace", textTransform: "uppercase", fontWeight: 700, border: "none", cursor: (checkoutLoading !== null || !oracleQuery.trim()) ? "not-allowed" : "pointer", opacity: !oracleQuery.trim() ? 0.45 : 1, transition: "opacity 0.15s" }}
               >{checkoutLoading === "strategy" ? "REDIRECTING..." : "GET STRATEGY — $25 →"}</button>
             </div>
 
@@ -444,6 +477,108 @@ export default function Home() {
               </div>
             ))}
           </div>
+        </div>
+      </div>
+
+      {/* ══════════════════════════════════════════════
+          SECTION 5 — THE BRIDGE (COMING SOON)
+      ══════════════════════════════════════════════ */}
+      <div id="bridge" style={{ position: "relative", borderTop: `1px solid ${BD}`, overflow: "hidden" }}>
+
+        {/* Portrait background with dark overlay */}
+        <div style={{
+          position: "absolute", inset: 0,
+          backgroundImage: "url('/crew_portrait.png')",
+          backgroundSize: "cover", backgroundPosition: "center top",
+          filter: "brightness(0.18) saturate(0.6)",
+        }} />
+        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.92) 100%)" }} />
+
+        {/* Content */}
+        <div style={{ position: "relative", maxWidth: 900, margin: "0 auto", padding: "96px 40px 80px", textAlign: "center" }}>
+
+          {/* Eyebrow */}
+          <div style={{ display: "inline-block", border: `1px solid ${GOLD_DIM}`, borderRadius: 999, padding: "4px 18px", fontSize: 10, color: GOLD_DIM, letterSpacing: 3, textTransform: "uppercase", fontFamily: "'Courier New', monospace", marginBottom: 28 }}>
+            Premium · Coming Soon
+          </div>
+
+          {/* Headline */}
+          <h2 style={{ fontSize: 48, fontWeight: 700, lineHeight: 1.1, letterSpacing: -1, marginBottom: 16, color: "#fff" }}>
+            Enter the Bridge
+          </h2>
+
+          {/* Subheadline */}
+          <p style={{ color: "#888", fontSize: 16, maxWidth: 520, margin: "0 auto 16px", lineHeight: 1.65 }}>
+            The world's first living AI command bridge.
+          </p>
+          <p style={{ color: "#555", fontSize: 13, maxWidth: 480, margin: "0 auto 48px", lineHeight: 1.7, fontFamily: "'Courier New', monospace" }}>
+            12 crew members. Real-time 3D. Every character animated by live system state.
+            AION's crystalline surface lights when she evaluates. MANTIS flares when the perimeter is tested.
+            ORPHEUS follows ANVIL's verdicts. You command from the captain's chair.
+          </p>
+
+          {/* CTA button */}
+          <div style={{ marginBottom: 40 }}>
+            <div style={{
+              display: "inline-block", background: "transparent",
+              border: `2px solid ${GOLD}`, color: GOLD,
+              padding: "16px 48px", borderRadius: 8,
+              fontSize: 14, letterSpacing: 3, fontFamily: "'Courier New', monospace",
+              textTransform: "uppercase", fontWeight: 700,
+              boxShadow: `0 0 32px rgba(212,175,55,0.15)`,
+              cursor: "default",
+            }}>
+              ENTER THE BRIDGE
+            </div>
+            <div style={{ marginTop: 12, fontSize: 11, color: "#444", letterSpacing: 2, fontFamily: "'Courier New', monospace", textTransform: "uppercase" }}>
+              Coming Soon · $25–50 / month
+            </div>
+          </div>
+
+          {/* Email capture */}
+          <div style={{ maxWidth: 420, margin: "0 auto" }}>
+            <div style={{ fontSize: 11, color: "#555", letterSpacing: 2, textTransform: "uppercase", fontFamily: "'Courier New', monospace", marginBottom: 14 }}>
+              Get notified when the Bridge launches
+            </div>
+            {bridgeSubmit === "done" ? (
+              <div style={{ color: GOLD, fontSize: 13, fontFamily: "'Courier New', monospace", letterSpacing: 1, padding: "12px 0" }}>
+                ✓ You're on the list. We'll signal when the Bridge is live.
+              </div>
+            ) : (
+              <div style={{ display: "flex", gap: 8 }}>
+                <input
+                  type="email"
+                  value={bridgeEmail}
+                  onChange={e => setBridgeEmail(e.target.value)}
+                  onKeyDown={e => { if (e.key === "Enter") submitBridgeEmail(); }}
+                  placeholder="your@email.com"
+                  style={{
+                    flex: 1, background: "rgba(255,255,255,0.04)",
+                    border: `1px solid #2a2a1a`, color: "#ccc",
+                    padding: "11px 16px", fontSize: 14,
+                    fontFamily: "'Courier New', monospace", outline: "none", borderRadius: 6,
+                  }}
+                />
+                <button
+                  onClick={submitBridgeEmail}
+                  disabled={bridgeSubmit === "sending" || !bridgeEmail.includes("@")}
+                  style={{
+                    background: bridgeSubmit === "error" ? "#3a1010" : GOLD,
+                    color: bridgeSubmit === "error" ? "#ff6666" : "#000",
+                    border: "none", padding: "11px 22px",
+                    fontSize: 10, letterSpacing: 2,
+                    cursor: (bridgeSubmit === "sending" || !bridgeEmail.includes("@")) ? "not-allowed" : "pointer",
+                    fontFamily: "'Courier New', monospace", textTransform: "uppercase",
+                    borderRadius: 6, fontWeight: 700, transition: "opacity 0.15s",
+                    opacity: !bridgeEmail.includes("@") ? 0.4 : 1,
+                  }}
+                >
+                  {bridgeSubmit === "sending" ? "..." : bridgeSubmit === "error" ? "ERR" : "NOTIFY"}
+                </button>
+              </div>
+            )}
+          </div>
+
         </div>
       </div>
 
