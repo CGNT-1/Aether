@@ -42,6 +42,7 @@ export default function Home() {
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
   const [checkoutError, setCheckoutError] = useState("");
   const [oracleQuery, setOracleQuery] = useState("");
+  const [referralCode, setReferralCode] = useState("");
   const [bridgeEmail, setBridgeEmail]     = useState("");
   const [bridgeSubmit, setBridgeSubmit]   = useState<"idle"|"sending"|"done"|"error">("idle");
 
@@ -67,7 +68,7 @@ export default function Home() {
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tier, query }),
+        body: JSON.stringify({ tier, query, referral_code: referralCode || undefined }),
       });
       const data = await res.json();
       if (data.url) {
@@ -84,6 +85,18 @@ export default function Home() {
 
   useEffect(() => {
     fetch("/api/status").then(r => r.json()).then(d => setStatus(d)).catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const ref = params.get("ref");
+    if (ref && /^[a-f0-9]{8}$/i.test(ref)) {
+      localStorage.setItem("referral_code", ref);
+      setReferralCode(ref);
+    } else {
+      const stored = localStorage.getItem("referral_code");
+      if (stored) setReferralCode(stored);
+    }
   }, []);
 
   useEffect(() => {

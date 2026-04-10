@@ -176,6 +176,7 @@ export async function POST(req: NextRequest) {
   const tier = (session.metadata?.tier || "") as "quick" | "full" | "strategy";
   const field = session.custom_fields?.find((f: any) => f.key === "idea");
   const query = field?.text?.value || unpackQuery((session.metadata as Record<string, string>) || {});
+  const referralCode = session.metadata?.referral_code || null;
 
   if (!query || !tier || !VERDICT_PROMPT[tier]) {
     console.error("Webhook: missing query or tier in session", sessionId);
@@ -183,6 +184,13 @@ export async function POST(req: NextRequest) {
   }
 
   const customerEmail = session.customer_details?.email || session.customer_email || null;
+
+  // Increment referral count if this payment came via a referral link
+  if (referralCode) {
+    const oracleToll = process.env.ORACLE_TOLL_URL || "http://68.183.206.103:8889";
+    fetch(`${oracleToll}/referral/${referralCode}/increment`, { method: "POST" })
+      .catch(e => console.warn(`[webhook] Referral increment failed for ${referralCode}:`, e));
+  }
 
   // Pre-compute verdict, cache it, and email the customer — async, fire and don't block Stripe
   (async () => {

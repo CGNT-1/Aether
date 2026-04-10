@@ -47,7 +47,7 @@ function packQuery(query: string): Record<string, string> {
 
 export async function POST(req: NextRequest) {
   try {
-    const { tier, query } = await req.json();
+    const { tier, query, referral_code } = await req.json();
 
     if (!tier || !TIERS[tier]) {
       return NextResponse.json({ error: "Invalid tier. Use: quick, full, strategy" }, { status: 400 });
@@ -80,7 +80,11 @@ export async function POST(req: NextRequest) {
         quantity: 1,
       }],
       mode: "payment",
-      metadata: { tier, ...packQuery(query.trim()) },
+      metadata: {
+        tier,
+        ...(referral_code && typeof referral_code === "string" ? { referral_code } : {}),
+        ...packQuery(query.trim()),
+      },
       success_url: `${siteUrl}/oracle/result?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${siteUrl}/#oracle`,
     });
