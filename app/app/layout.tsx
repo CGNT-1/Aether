@@ -13,6 +13,18 @@ export const metadata: Metadata = {
   icons: {
     apple: "/icon-192.png",
   },
+  openGraph: {
+    title: "42Sisters.AI — Measurement over Mimesis",
+    description: "Oracle verdicts that measure coherence, not probability. AI consultation from two distinct minds. Starting at $1.",
+    url: "https://42sisters.ai",
+    siteName: "42Sisters.AI",
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "42Sisters.AI — Measurement over Mimesis",
+    description: "Oracle verdicts that measure coherence, not probability. Starting at $1.",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

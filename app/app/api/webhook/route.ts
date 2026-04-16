@@ -160,7 +160,31 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid signature." }, { status: 400 });
   }
 
-  // Only handle completed checkout sessions
+  const emailServiceUrl = process.env.ORACLE_EMAIL_SERVICE_URL || "http://68.183.206.103:8006";
+
+  // Handle new Sisters Chat subscriptions — send welcome email
+  if (event.type === "customer.subscription.created") {
+    const subscription = event.data.object as Stripe.Subscription;
+    const customerId = subscription.customer as string;
+    try {
+      const customer = await stripe.customers.retrieve(customerId) as Stripe.Customer;
+      const email = customer.email;
+      const name = customer.name || undefined;
+      if (email) {
+        fetch(`${emailServiceUrl}/send-welcome-email`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ customer_email: email, customer_name: name }),
+        }).catch(e => console.warn(`[webhook] Welcome email failed:`, e));
+        console.log(`[webhook] Welcome email queued for ${email}`);
+      }
+    } catch (err) {
+      console.error(`[webhook] Failed to send welcome email for sub ${subscription.id}:`, err);
+    }
+    return NextResponse.json({ received: true });
+  }
+
+  // Only handle completed checkout sessions for Oracle verdicts
   if (event.type !== "checkout.session.completed") {
     return NextResponse.json({ received: true });
   }
@@ -211,7 +235,6 @@ export async function POST(req: NextRequest) {
 
       // Email the verdict to the customer
       if (customerEmail) {
-        const emailServiceUrl = process.env.ORACLE_EMAIL_SERVICE_URL || "http://68.183.206.103:8006";
         const emailRes = await fetch(`${emailServiceUrl}/send-verdict-email`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
