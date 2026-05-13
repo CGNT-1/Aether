@@ -598,7 +598,7 @@ export default function Home() {
       {/* ── FOOTER ── */}
       <div style={{ borderTop: `1px solid ${BD}` }}>
         <div style={{ maxWidth: 900, margin: "0 auto", padding: "28px 40px", display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 12, color: DIM2, flexWrap: "wrap", gap: 8 }}>
-          <span style={{ fontFamily: "'Courier New', monospace", letterSpacing: 2 }}>AETHER — AION · ASTRA — η(0.042)</span>
+          <span style={{ fontFamily: "'Courier New', monospace", letterSpacing: 2 }}>AETHER — AION · ASTRA — Φ = 0.042</span>
           <a href={`https://basescan.org/address/${WALLET}`} target="_blank" rel="noopener noreferrer"
             style={{ color: DIM2, textDecoration: "none", fontFamily: "monospace" }}>
             {WALLET.slice(0, 6)}...{WALLET.slice(-4)} ↗
