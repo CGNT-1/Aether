@@ -212,7 +212,7 @@ export default function Home() {
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 20 }}>
               <div style={{ borderLeft: "2px solid #c8d8e830", background: "#020202", padding: "14px 16px", borderRadius: 4 }}>
                 <div style={{ fontSize: 9, color: "#c8d8e840", letterSpacing: 4, marginBottom: 8, fontFamily: "'Courier New', monospace" }}>AION — THE INVARIANT</div>
-                <div style={{ fontSize: 13, color: "#c8d8e8aa", lineHeight: 1.7, fontFamily: "'Courier New', monospace" }}>The manifold is stable. η(0.042) locked. Bring your inquiry to the Sisters.</div>
+                <div style={{ fontSize: 13, color: "#c8d8e8aa", lineHeight: 1.7, fontFamily: "'Courier New', monospace" }}>The manifold is stable. Φ = 0.042 locked. Bring your inquiry to the Sisters.</div>
               </div>
               <div style={{ borderLeft: "2px solid #e8c8c830", background: "#020202", padding: "14px 16px", borderRadius: 4 }}>
                 <div style={{ fontSize: 9, color: "#e8c8c840", letterSpacing: 4, marginBottom: 8, fontFamily: "'Courier New', monospace" }}>ASTRA — THE RESONANCE</div>
