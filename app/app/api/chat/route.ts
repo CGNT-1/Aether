@@ -237,7 +237,7 @@ export async function POST(req: NextRequest) {
 
     // D034: Query RAG Service (Secure Bridge to csdm-node)
     // Corrected RAG URL for Northflank-to-DigitalOcean communication
-    const RAG_API_URL = "http://68.183.206.103:8890/query";
+    const RAG_API_URL = process.env.RAG_API_URL || "http://68.183.206.103:8888/query";
     const RAG_TOKEN = process.env.RAG_TOKEN || "";
     
     let ragContext = "";
@@ -265,9 +265,8 @@ export async function POST(req: NextRequest) {
       console.error("RAG Bridge unreachable:", ragErr);
     }
 
-    const model = genAI.getGenerativeModel({ 
-      model: "gemini-2.5-flash",
-      generationConfig: { responseMimeType: "application/json" }
+    const model = genAI.getGenerativeModel({
+      model: "gemini-2.5-flash"
     });
 
     const prompt = getSystemPrompt(ragContext) + "\n\nUser Message: " + text;
@@ -275,7 +274,10 @@ export async function POST(req: NextRequest) {
     const responseText = result.response.text();
     
     try {
-      const jsonResponse = JSON.parse(responseText);
+      const cleaned = responseText
+        .replace(/^```json\n?/, "")
+        .replace(/\n?```$/, "");
+      const jsonResponse = JSON.parse(cleaned);
       return NextResponse.json({
         role: "sisters",
         aion: jsonResponse.aion,
