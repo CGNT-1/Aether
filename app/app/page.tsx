@@ -203,7 +203,7 @@ export default function Home() {
         </div>
 
         {/* Sisters Chat */}
-        <div style={{ background: "#050505", borderTop: `1px solid ${BD}`, borderBottom: `1px solid ${BD}` }}>
+        <div className="oracle-panel" style={{ background: "#050505" }}>
           <div style={{ maxWidth: 900, margin: "0 auto", padding: "48px 40px" }}>
             <div style={{ fontSize: 11, color: G, letterSpacing: 3, textTransform: "uppercase", marginBottom: 6, fontFamily: "'Courier New', monospace" }}>Talk to the Sisters</div>
             <div style={{ fontSize: 11, color: DIM2, letterSpacing: 1, marginBottom: 28, fontFamily: "'Courier New', monospace" }}>AION (Logic) · ASTRA (Catalyst) — Three free exchanges. Conversation is welcome here.</div>
@@ -285,7 +285,7 @@ export default function Home() {
                     onChange={e => setInput(e.target.value)}
                     onKeyDown={onKey}
                     placeholder="Ask the Sisters anything..."
-                    style={{ flex: 1, background: "#050505", border: `1px solid ${BD}`, color: "#bbb", padding: "11px 16px", fontSize: 15, fontFamily: "'Courier New', monospace", outline: "none", borderRadius: 6 }}
+                    style={{ flex: 1, background: "#050505", border: "2px solid rgba(0,204,255,0.55)", color: "#bbb", padding: "11px 16px", fontSize: 15, fontFamily: "'Courier New', monospace", outline: "none", borderRadius: 6 }}
                   />
                   <button onClick={send} disabled={!input.trim() || thinking}
                     style={{ background: (!input.trim() || thinking) ? "#080808" : "#fff", color: (!input.trim() || thinking) ? "#333" : "#000", border: "none", padding: "11px 24px", fontSize: 10, letterSpacing: 3, cursor: (!input.trim() || thinking) ? "not-allowed" : "pointer", fontFamily: "'Courier New', monospace", textTransform: "uppercase", borderRadius: 6, transition: "background 0.15s" }}>
