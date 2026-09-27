@@ -1,19 +1,17 @@
-# This config was automatically generated from your source code
-# Stacks detected: deps:node:.
+# Real test job: the Aether yield logic is Python (stdlib only), so this
+# replaces the auto-generated "No test specified" node job with a stdlib
+# unittest run. No credentials, no network, no install step.
 version: 2.1
-orbs:
-  node: circleci/node@5
 jobs:
-  test-node:
-    # Install node dependencies and run tests
-    executor: node/default
+  test:
+    docker:
+      - image: cimg/python:3.12
+    resource_class: small
     steps:
       - checkout
-      - node/install-packages:
-          pkg-manager: npm
       - run:
-          name: Run tests
-          command: echo \"No test specified in package.json\"
+          name: Run unit tests
+          command: python -m unittest discover -s tests -v
   deploy:
     # This is an example deploy job, not actually used by the workflow
     docker:
@@ -44,7 +42,7 @@ jobs:
 workflows:
   build-and-test:
     jobs:
-      - test-node
+      - test
     # - deploy:
     #     requires:
-    #       - test-node
+    #       - test
