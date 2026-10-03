@@ -266,7 +266,7 @@ export async function POST(req: NextRequest) {
     }
 
     const model = genAI.getGenerativeModel({
-      model: "gemini-2.5-flash"
+      model: "gemini-3.8-flash"
     });
 
     const prompt = getSystemPrompt(ragContext) + "\n\nUser Message: " + text;

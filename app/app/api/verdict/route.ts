@@ -177,7 +177,7 @@ export async function GET(req: NextRequest) {
     // Generate verdict via Gemini
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || "");
     const model = genAI.getGenerativeModel({
-      model: "gemini-2.5-flash",
+      model: "gemini-3.8-flash",
       generationConfig: { responseMimeType: "application/json" }
     });
 

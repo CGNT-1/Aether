@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json<AgentResponse>({ error: "Missing userMessage" }, { status: 400 });
     }
 
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-3.8-flash" });
     const result = await model.generateContent(userMessage);
     const response = result.response.text();
 
