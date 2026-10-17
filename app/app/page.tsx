@@ -590,6 +590,9 @@ export default function Home() {
                 </button>
               </div>
             )}
+            <div style={{ marginTop: 10, fontSize: 10, color: "#444", letterSpacing: 1, fontFamily: "'Courier New', monospace" }}>
+              One email when the Bridge launches. Never shared. Ask us to remove you anytime.
+            </div>
           </div>
 
         </div>

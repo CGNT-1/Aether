@@ -237,7 +237,7 @@ export async function POST(req: NextRequest) {
 
     // D034: Query RAG Service (Secure Bridge to csdm-node)
     // Corrected RAG URL for Northflank-to-DigitalOcean communication
-    const RAG_API_URL = process.env.RAG_API_URL || "http://68.183.206.103:8888/query";
+    const RAG_API_URL = process.env.RAG_API_URL || "http://127.0.0.1:8888/query";
     const RAG_TOKEN = process.env.RAG_TOKEN || "";
     
     let ragContext = "";
