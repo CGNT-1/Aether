@@ -160,7 +160,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid signature." }, { status: 400 });
   }
 
-  const emailServiceUrl = process.env.ORACLE_EMAIL_SERVICE_URL || "http://68.183.206.103:8006";
+  const emailServiceUrl = process.env.ORACLE_EMAIL_SERVICE_URL;
+  if (!emailServiceUrl) {
+    console.error("ORACLE_EMAIL_SERVICE_URL not set — webhook cannot send customer email");
+    return NextResponse.json({ error: "Email service not configured." }, { status: 503 });
+  }
 
   // Handle new Sisters Chat subscriptions — send welcome email
   if (event.type === "customer.subscription.created") {
@@ -211,9 +215,13 @@ export async function POST(req: NextRequest) {
 
   // Increment referral count if this payment came via a referral link
   if (referralCode) {
-    const oracleToll = process.env.ORACLE_TOLL_URL || "http://68.183.206.103:8889";
-    fetch(`${oracleToll}/referral/${referralCode}/increment`, { method: "POST" })
-      .catch(e => console.warn(`[webhook] Referral increment failed for ${referralCode}:`, e));
+    const oracleToll = process.env.ORACLE_TOLL_URL;
+    if (!oracleToll) {
+      console.error(`[webhook] ORACLE_TOLL_URL not set — referral increment skipped for ${referralCode}`);
+    } else {
+      fetch(`${oracleToll}/referral/${referralCode}/increment`, { method: "POST" })
+        .catch(e => console.warn(`[webhook] Referral increment failed for ${referralCode}:`, e));
+    }
   }
 
   // Pre-compute verdict, cache it, and email the customer — async, fire and don't block Stripe
