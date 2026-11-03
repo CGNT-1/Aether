@@ -23,7 +23,7 @@ import { NextRequest, NextResponse } from "next/server";
  * of its own — access control lives in oracle_toll.
  */
 
-const ORACLE_NODE = process.env.ORACLE_NODE_URL || "http://68.183.206.103";
+const ORACLE_NODE = process.env.ORACLE_NODE_URL;
 
 // Headers to forward from the client to oracle_toll
 const FORWARD_REQUEST_HEADERS = ["content-type", "x-payment", "x-rag-token"];
@@ -36,6 +36,13 @@ type RouteContext = { params: Promise<{ path: string[] }> };
 async function proxy(req: NextRequest, ctx: RouteContext, method: string): Promise<NextResponse> {
   const { path } = await ctx.params;
   const upstreamPath = "/" + path.join("/");
+  if (!ORACLE_NODE) {
+    console.error("Oracle proxy: ORACLE_NODE_URL not set — oracle proxy disabled");
+    return NextResponse.json(
+      { error: "Oracle not configured", path: upstreamPath },
+      { status: 503 }
+    );
+  }
   const upstreamUrl = ORACLE_NODE + upstreamPath;
 
   // Forward safe request headers

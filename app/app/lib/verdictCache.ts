@@ -1,6 +1,10 @@
-const ORACLE_TOLL_URL = process.env.ORACLE_TOLL_URL || "http://68.183.206.103:8889";
+const ORACLE_TOLL_URL = process.env.ORACLE_TOLL_URL;
 
 export async function cacheVerdict(sessionId: string, payload: any): Promise<void> {
+  if (!ORACLE_TOLL_URL) {
+    console.error("[verdictCache] ORACLE_TOLL_URL not set — verdict not cached");
+    return;
+  }
   try {
     await fetch(`${ORACLE_TOLL_URL}/cache/${sessionId}`, {
       method: "POST",
@@ -13,6 +17,10 @@ export async function cacheVerdict(sessionId: string, payload: any): Promise<voi
 }
 
 export async function getCachedVerdict(sessionId: string): Promise<any | null> {
+  if (!ORACLE_TOLL_URL) {
+    console.error("[verdictCache] ORACLE_TOLL_URL not set — treating as cache miss");
+    return null;
+  }
   try {
     const res = await fetch(`${ORACLE_TOLL_URL}/cache/${sessionId}`);
     if (res.status === 404) return null;

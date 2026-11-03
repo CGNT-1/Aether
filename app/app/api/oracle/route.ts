@@ -9,12 +9,19 @@ import { NextRequest, NextResponse } from "next/server";
  * For sub-routes (/query, /query/full, /health, etc.) see [...path]/route.ts
  */
 
-const ORACLE_NODE = process.env.ORACLE_NODE_URL || "http://68.183.206.103";
+const ORACLE_NODE = process.env.ORACLE_NODE_URL;
 
 const FORWARD_REQUEST_HEADERS = ["content-type", "x-payment", "x-rag-token"];
 const FORWARD_RESPONSE_HEADERS = ["content-type", "x-oracle-version"];
 
 async function proxyTo(req: NextRequest, upstreamPath: string, method: string): Promise<NextResponse> {
+  if (!ORACLE_NODE) {
+    console.error("Oracle proxy: ORACLE_NODE_URL not set — oracle proxy disabled");
+    return NextResponse.json(
+      { error: "Oracle not configured", path: upstreamPath },
+      { status: 503 }
+    );
+  }
   const upstreamUrl = ORACLE_NODE + upstreamPath;
 
   const forwardHeaders: Record<string, string> = {};
